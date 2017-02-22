@@ -1,7 +1,7 @@
 
 /* eslint import/no-extraneous-dependencies:off */
 
-// require('regenerator-runtime/runtime');
+require('regenerator-runtime/runtime');
 require('babel-register');
 
 process.on('unhandledRejection', (err, p) => {
