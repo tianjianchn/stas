@@ -27,6 +27,12 @@ describe('immutable-state: list', function () {
     });
   });
   describe('methods', function () {
+    it('.slice()', function () {
+      assert.deepStrictEqual(List().slice(1).toJSON(), []);
+      assert.deepStrictEqual(List([1, 2]).slice().toJSON(), [1, 2]);
+      assert.deepStrictEqual(List([1, 2]).slice(1).toJSON(), [2]);
+      assert.deepStrictEqual(List([1, 2]).slice(-1).toJSON(), [2]);
+    });
     it('.findIndex()', function () {
       const result = [];
       result.push(List().findIndex((value, key) => value === 2));

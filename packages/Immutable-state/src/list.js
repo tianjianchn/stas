@@ -27,6 +27,9 @@ function List(initialData) {
 inherits(List, Collection);
 List.prototype._type = 'list';
 
+List.prototype.slice = function slice(start, end) {
+  return this._fromJSON(this._data.slice(start, end));
+};
 
 // returns the index for which the callback returns true.
 // returns -1 other than undefined if none match
