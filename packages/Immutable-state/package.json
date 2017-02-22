@@ -1,7 +1,7 @@
 {
   "name": "immutable-state",
-  "description": "Models and immutable data support for stas",
-  "version": "0.1.0",
+  "description": "An immutable state",
+  "version": "0.1.1",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -13,10 +13,9 @@
   "dependencies": {
     "lodash.isplainobject": "^4.0.6"
   },
-  "devDependencies": {
-  },
-  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-model",
-  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/stas-model",
+  "devDependencies": {},
+  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/immutable-state",
+  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/immutable-state",
   "bugs": "https://github.com/tianjianchn/stas/issues",
   "license": "MIT",
   "author": {
@@ -24,20 +23,7 @@
     "email": "tianjianchn@qq.com"
   },
   "keywords": [
-    "stas",
-    "struct",
-    "flux",
     "state",
-    "model",
-    "orm",
-    "normalize",
-    "immutable",
-    "express",
-    "midd",
-    "middleware",
-    "use",
-    "promise",
-    "async",
-    "await"
+    "immutable"
   ]
 }

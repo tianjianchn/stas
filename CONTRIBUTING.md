@@ -3,8 +3,8 @@
 
 ### Setup
 ```bash
-git clone https://github.com/tianjianchn/midd
-cd midd
+git clone https://github.com/tianjianchn/stas
+cd stas
 npm install
 npm run bootstrap
 ```

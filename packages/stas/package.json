@@ -23,14 +23,10 @@
     "email": "tianjianchn@qq.com"
   },
   "keywords": [
+    "stas",
     "flux",
     "state",
-    "model",
-    "orm",
-    "normalize",
-    "immutable",
     "express",
-    "midd",
     "middleware",
     "use",
     "promise",

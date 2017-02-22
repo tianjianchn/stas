@@ -1,5 +1,6 @@
 
 const assert = require('assert');
+const Router = require('uni-router');
 // const { inspect } = require('util');
 const { createStore } = require('..');
 
@@ -35,10 +36,10 @@ describe('stas-immutable: usage', function () {
     await store.dispatch('/add-task', { task: { id: 1, text: 'xxx', completed: false } });
     assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }] });
 
-    store.dispatch('/add-task', { task: { id: 2, text: 'yyy', completed: false } });
+    await store.dispatch('/add-task', { task: { id: 2, text: 'yyy', completed: false } });
     assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }, { id: 2, text: 'yyy', completed: false }] });
 
-    store.dispatch('/toggle-task', { id: 2 });
+    await store.dispatch('/toggle-task', { id: 2 });
     assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }, { id: 2, text: 'yyy', completed: true }] });
 
     assert.deepStrictEqual(states.length, 4);
@@ -57,6 +58,43 @@ describe('stas-immutable: usage', function () {
     assert.notEqual(state2.toJSON(), state3.toJSON());
     assert.notEqual(state2.toJSON(), state4.toJSON());
     assert.notEqual(state3.toJSON(), state4.toJSON());
+  });
+
+  it('should work with router', async function () {
+    const store = createStore({
+      tasks: [],
+    });
+
+    store.subscribe((newState) => {
+    });
+
+    const router = Router();
+    router.all('/add-task', (req, resp, next) => {
+      store.mutate((newState) => {
+        newState.set('tasks', tasks => tasks.push(req.body.task));
+      });
+    });
+    router.all('/toggle-task', (req, resp, next) => {
+      const id = req.body.id;
+      store.mutate((newState) => {
+        newState.set('tasks', (tasks) => {
+          const index = tasks.findIndex(t => t.id === id);
+          const completed = tasks.get([index, 'completed']);
+          tasks = tasks.set([index, 'completed'], !completed);
+          return tasks;
+        });
+      });
+    });
+    store.use(router);
+
+    await store.dispatch('/add-task', { task: { id: 1, text: 'xxx', completed: false } });
+    assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }] });
+
+    await store.dispatch('/add-task', { task: { id: 2, text: 'yyy', completed: false } });
+    assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }, { id: 2, text: 'yyy', completed: false }] });
+
+    await store.dispatch('/toggle-task', { id: 2 });
+    assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }, { id: 2, text: 'yyy', completed: true }] });
   });
 });
 

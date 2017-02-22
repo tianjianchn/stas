@@ -1,92 +1,115 @@
-State management with models, immutable data and promise-based middlewares
+A promise-based, middleware-driven, express-like and immutable built-in state management
 =================================
 
-## Current Progress
-* [x] Support express-like(use-like) and promise-based middlewares
-* [x] Support Map, like `{count: Number, login: {name: String}}`
-* [x] Support List, like `List(Number)`
-* [x] Support Model, like `Model('User', {name: String})`
-* [x] Support used with react component
-* [ ] Support normalization and validation for key's value
-* [ ] Support auto/manual garbage collection for non-referenced model records 
-* [ ] Support serialization for the state
-* [ ] Consider practice on server render phase
-* [ ] Consider partial data mount and unmount, to keep store low-memory cost
+### Features
+* Immutable state and operations, see [Immutable State](#immutable-state)
+* Express-like and promise-based middlewares and routers, see [Middleware](#middleware) and [Router](#router)
 
-## Features
-* Use model to define your structured and relational data
-* Support express-like(use-like) and promise-based middlewares
-* Allow async call(promise/async-await) in the middleware
-* Use immutable data and operates like immutable.js
-
-## Example
+### Example
+`store.js` file:
 ```js
-//store.js
-//define a model
-const User = Model('User', {
-  name: String,//literal key
-  houses: List(House),//refer another model
-})
-const House = Model('House', {
-  addr: String,
-  user: User,
-})
+const router = reuqire('./router');
+const {createStore} = require('stas-immutable');
+const store = createStore({
+  tasks: [],
+});
+store.use(router)
+```
 
-const structure = {
-  loginUser: User,
-  houseCount: Number, houses: List(House),
-  prices: {dollar: Number, rmb: Number}
-}
-const store = new Store({structure});
-store.use(router);
+`router.js` file:
+```js
+const Router = require('uni-router');
+const router = Router();
+router.all('/add-task', async (req, resp, next) => {
+  const {store} = req, {text} = req.body;
+  const result = await fetch('/server/add-task', {text})
+  const {id} = result;
+  store.mutate((newState) => {
+    newState.set('tasks', tasks => tasks.push({id, text, completed: false}));
+  });
+});
+router.all('/toggle-task', (req, resp, next) => {
+  const {store} = req, {id} = req.body;
+  store.mutate((newState) => {
+    newState.set('tasks', (tasks) => {
+      const index = tasks.findIndex(t => t.id === id);
+      const completed = tasks.get([index, 'completed']);
+      tasks = tasks.set([index, 'completed'], !completed);
+      return tasks;
+    });
+  });
+});
+```
 
-//router.js
-const router = require('use-router');
-router.all('/houses/query', (req)=>{
-  const store = req.store;
-  let state = store.state;
-  return fetch('/houses/query', {userId: state.get(['loginUser', 'id'])})
-  .then((result)=>{
-    const {rows, count} = result;
+`TodoListPage.js` file:
+```js
+const {PureComponent, PropTypes} = require('react');
+const {connect} = require('react-stas');
 
-    store.mutate((newState)=>{
-      const houses = House.merge(rows)
-      newState.set('houses', newState.get('houses').push(houses));
-      newState.set('houseCount', count);
-      newState.set(['houseCount', 'dollar'], count*1000);
-    })
-  })
-  .catch(err=>{
-
-  })
-})
-
-//AllHousesListView.js
-class AllHousesListView extends Component{
-  componentDidMount(){
-    this.props.dispatch('/houses/query');
+class TodoListPage extends PureComponent{
+  static propTypes = {
+    tasks: PropTypes.array.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+  onPressAddTask = ()=>{
+    return dispatch('/add-task', {text: `Remove the password: ${Math.random()}`})
+  }
+  onPressToggleTask = (id)=>{
+    return dispatch('/toggle-task', {id})
   }
   render(){
-    const elHouseList = this.props.houses.map(house=><span>{house.get('id')} {house.get('addr')}</span>)
-    return (<ul>
-      {elHouseList}
-    </ul>)
+    return (
+      <button onClick={this.onPressAddTask}>Add Task</button>
+      <ul>
+        {this.props.tasks.map(task=><li>
+          <input type='checkbox' value={task.completed} onClick={()=>this.onPressToggleTask(task.id)}/>
+          <span>{task.get('text')}</span>
+        </li>)}
+      </ul>
+    )
   }
 }
 
 connect((state, dispatch)=>{
-  return {houses: state.get('houses')}
-})(AllHousesListView)
+  return {tasks: state.get('tasks').toJSON()}
+})(TodoListPage)
 ```
 
-## Development
-1. Run `npm run watch` in other terminal
-2. Run `npm run test:only -s` to do test only work
-3. Run `npm test` to do lint, build and test, before publish
-4. Run `npm run cover` to do coverage test
-5. Run `npm run perf` to do performance check
+`index.js` file:
+```js
+const ReactDom = require('react-dom');
+const {Provider} = require('react-stas')
+const store = require('./store');
+const TodoListPage = require('./TodoListPage');
 
-## License
+ReactDom.render(
+  <Provider store={store}><TodoListPage /></Provider>,
+  document.getElementById('app')
+);
+```
+
+### Immutable State
+State is immutable by using [immutable-state](/packages/immutable-state). Most operations are like [immutable-js](https://github.com/facebook/immutable-js/). 
+You must use mutation methods(like `.set()`, `.remove()`) in `store.mutate()`, while others(like `.get()`, `.filter()`) are not.
+
+#### store.mutate(callback)
+Start a new mutation operation. You should call all mutation methods in `callback` function. `callback` should use sync code, no promise or `async/await`.
+
+#### .get(keysPath)
+
+#### .set(keysPath)
+
+### Middleware
+
+#### store.use((req, resp, next)=>{})
+
+### Router
+See [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
+
+### Contributing
+Checkout the [CONTRIBUTING.md](/CONTRIBUTING.md) if you want to help
+
+### License
 Licensed under MIT
 
-Copyright (c) 2017 [kiliwalk](https://github.com/kiliwalk)
+Copyright (c) 2017 [Tian Jian](https://github.com/tianjianchn)
