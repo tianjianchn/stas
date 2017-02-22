@@ -1,0 +1,40 @@
+{
+  "name": "stas",
+  "description": "A promise-based, middleware-driven and express-like state management",
+  "version": "0.1.1",
+  "scripts": {},
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 4"
+  },
+  "dependencies": {
+    "uni-compose": "^0.1.0"
+  },
+  "devDependencies": {},
+  "homepage": "https://github.com/tianjianchn/stas",
+  "repository": "https://github.com/tianjianchn/stas",
+  "bugs": "https://github.com/tianjianchn/stas/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Tian Jian",
+    "email": "tianjianchn@qq.com"
+  },
+  "keywords": [
+    "flux",
+    "state",
+    "model",
+    "orm",
+    "normalize",
+    "immutable",
+    "express",
+    "midd",
+    "middleware",
+    "use",
+    "promise",
+    "async",
+    "await"
+  ]
+}

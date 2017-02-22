@@ -1,0 +1,43 @@
+{
+  "name": "stas-immutable",
+  "description": "Models and immutable data support for stas",
+  "version": "0.1.0",
+  "scripts": {},
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 4"
+  },
+  "dependencies": {
+    "immutable-state": "^0.1.0",
+    "stas": "^0.1.0"
+  },
+  "devDependencies": {},
+  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-model",
+  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/stas-model",
+  "bugs": "https://github.com/tianjianchn/stas/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Tian Jian",
+    "email": "tianjianchn@qq.com"
+  },
+  "keywords": [
+    "stas",
+    "struct",
+    "flux",
+    "state",
+    "model",
+    "orm",
+    "normalize",
+    "immutable",
+    "express",
+    "midd",
+    "middleware",
+    "use",
+    "promise",
+    "async",
+    "await"
+  ]
+}
