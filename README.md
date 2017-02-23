@@ -106,6 +106,28 @@ Start a new mutation operation. You should call all mutation methods in `callbac
 ### Router
 See [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
 
+### Hot Reload(HMR)
+Since react-native don't support `module.hot.accept(path, callback)` but `module.hot.accept(callback)`, we have to use a function to export the store, and take advantage of closure to replace the middlewares(routers) in that function.
+
+```js
+import { createStore } from 'stas-immutable';
+import routers from './routers';
+
+export default function configureStore() {
+  const store = createStore()
+  store.use(routers);
+
+  if (module.hot) {
+    module.hot.accept(() => {
+      const newRouters = require('./routers').default;
+      store.clearMiddlewares();
+      store.use(newRouters);
+    });
+  }
+  return store;
+}
+```
+
 ### Contributing
 Checkout the [CONTRIBUTING.md](/CONTRIBUTING.md) if you want to help
 

@@ -39,4 +39,13 @@ describe('stas: middleware', function () {
     const result = await store.dispatch('/');
     assert.equal(result, 1);
   });
+  it('.clearMiddlewares()', async function () {
+    const store = createStore();
+    const result = [];
+    store.use((req, resp, next) => result.push(1));
+    await store.dispatch('/');
+    store.clearMiddlewares();
+    await store.dispatch('/');
+    assert.deepStrictEqual(result, [1]);
+  });
 });

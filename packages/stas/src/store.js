@@ -26,6 +26,11 @@ class StasStore {
     return this;
   }
 
+  clearMiddlewares = () => {
+    this._middlewares = [];
+    this._stack = null;
+  }
+
   subscribe = (listener) => {
     this._subscribers.push(listener);
     const unsubscribe = () => this._subscribers.splice(this._subscribers.indexOf(listener), 1);
