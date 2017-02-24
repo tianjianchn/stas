@@ -1,7 +1,7 @@
 {
   "name": "stas",
   "description": "A promise-based, middleware-driven and express-like state management",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
