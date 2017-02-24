@@ -1,7 +1,7 @@
 {
   "name": "stas-immutable",
   "description": "A promise-based, middleware-driven, express-like and immutable built-in state management",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "immutable-state": "^0.1.6",
-    "stas": "^0.1.7"
+    "stas": "^0.1.8"
   },
   "devDependencies": {},
   "homepage": "https://github.com/tianjianchn/stas",
