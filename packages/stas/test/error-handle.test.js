@@ -17,10 +17,10 @@ describe('stas: error handle', function () {
   it('should throw with not-function in use()', function () {
     const store = createStore();
     store.use();
-    assert.throws(() => store.use(1), /only accept function in use\(\)/);
+    assert.throws(() => store.use(1), /Only accept function in use\(\)/);
   });
   it('should throw with empty url in dispatch', function () {
     const store = createStore();
-    assert.throws(() => store.dispatch(), /require url/);
+    assert.throws(() => store.dispatch(), /URL required/);
   });
 });

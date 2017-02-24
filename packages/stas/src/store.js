@@ -3,8 +3,8 @@ const compose = require('uni-compose');
 
 class StasStore {
   _state = null;
-  _subscribers = [];// listeners called on state changed
-  _middlewares = [];// middleware(funcitons) array
+  _subscribers = [];// listeners subscribed on state changed
+  _middlewares = [];
   _stack = null;// composed middleware
 
   constructor(initialState) {
@@ -22,7 +22,7 @@ class StasStore {
     const len = middlewares.length;
     for (let ii = 0; ii < len; ++ii) {
       const middleware = middlewares[ii];
-      if (typeof middleware !== 'function') throw new TypeError('only accept function in use()');
+      if (typeof middleware !== 'function') throw new TypeError('Only accept function in use()');
       this._middlewares.push(middleware);
     }
     return this;
@@ -40,9 +40,9 @@ class StasStore {
   }
 
   dispatch(url, body = {}) {
-    if (!url || typeof url !== 'string') throw new Error('require url(path) in dispatch()');
+    if (!url || typeof url !== 'string') throw new Error('URL required in dispatch()');
 
-    if (!this._stack) this._stack = compose(this._middlewares);// cache stack
+    if (!this._stack) this._stack = compose(this._middlewares);// cache the stack
 
     const req = { store: this, method: true, url, body };
     const resp = this;
