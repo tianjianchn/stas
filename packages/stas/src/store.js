@@ -9,6 +9,7 @@ class StasStore {
 
   constructor(initialState) {
     this._state = initialState;
+    this.dispatch = this.dispatch.bind(this);// bind this since will be used in connect()/components
   }
 
   get state() {

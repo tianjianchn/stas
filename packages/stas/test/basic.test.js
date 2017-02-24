@@ -1,6 +1,6 @@
 
 const assert = require('assert');
-const { createStore } = require('..');
+const { createStore, Store } = require('..');
 
 describe('stas: basic', function () {
   it('should work with empty initial state', function () {
@@ -54,7 +54,6 @@ describe('stas: basic', function () {
     assert.equal(store.state, state);
     assert.deepStrictEqual(store.state, { a: 2 });
   });
-
   it('should trigger subscribers after state changed', function (done) {
     const store = createStore({ a: '' });
     store.subscribe((newState, oldState) => {
@@ -63,5 +62,25 @@ describe('stas: basic', function () {
       done();
     });
     store.setState({ a: 1 });
+  });
+  describe('.dispatch()', function () {
+    it('should bound this with store', function () {
+      const store = createStore();
+      const dispatch = store.dispatch;
+      dispatch('/');// shoud not throw
+    });
+    it('should have override ability by child class', async function () {
+      const result = [];
+      class SubStore extends Store {
+        dispatch(...args) {
+          result.push(1);
+          super.dispatch(...args);
+        }
+      }
+      const store = new SubStore();
+      store.use(() => (result.push(2)));
+      await store.dispatch('/');
+      assert.deepStrictEqual(result, [1, 2]);
+    });
   });
 });
