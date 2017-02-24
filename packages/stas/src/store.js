@@ -17,27 +17,29 @@ class StasStore {
 
   getState = () => this._state
 
-  use = (...middlewares) => {
+  use(...middlewares) {
     this._stack = null;
-    for (const middleware of middlewares) {
+    const len = middlewares.length;
+    for (let ii = 0; ii < len; ++ii) {
+      const middleware = middlewares[ii];
       if (typeof middleware !== 'function') throw new TypeError('only accept function in use()');
       this._middlewares.push(middleware);
     }
     return this;
   }
 
-  clearMiddlewares = () => {
+  clearMiddlewares() {
     this._middlewares = [];
     this._stack = null;
   }
 
-  subscribe = (listener) => {
+  subscribe(listener) {
     this._subscribers.push(listener);
     const unsubscribe = () => this._subscribers.splice(this._subscribers.indexOf(listener), 1);
     return unsubscribe;
   }
 
-  dispatch = (url, body = {}) => {
+  dispatch(url, body = {}) {
     if (!url || typeof url !== 'string') throw new Error('require url(path) in dispatch()');
 
     if (!this._stack) this._stack = compose(this._middlewares);// cache stack
