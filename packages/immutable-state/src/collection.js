@@ -255,6 +255,62 @@ Collection.prototype.delete = Collection.prototype.remove = function remove(key)
   return cloned;
 };
 
+// merge the value using specific strategy.
+// strategy: false for normal, true for deep merge, or function for custom merge
+Collection.prototype.merge = function merge(...args) {
+  let strategy = false,
+    value = null;
+  if (args.length < 2) value = args[0];
+  else {
+    strategy = args[0];
+    value = args[1];
+  }
+
+  // check strategy
+  const type = typeof strategy;
+  if (type !== 'boolean' && type !== 'function') {
+    throw new Error('Strategy passed to merge() should be boolean or function');
+  }
+
+  value = this._fromJSON(value);
+  if (!(value instanceof Collection)) {
+    throw new Error('Value passed to merge() cannot be converted to collection');
+  }
+
+  const cloned = this._clone();
+  if (!cloned._changed) {
+    cloned._changed = true;
+    if (cloned._type === 'list') cloned._data = [...cloned._data];
+    else cloned._data = { ...cloned._data };
+  }
+
+  if (strategy === false) {
+    for (const kk in value._data) {
+      cloned._data[kk] = value._data[kk];
+    }
+  } else if (strategy === true) {
+    for (const kk in value._data) {
+      const next = value._data[kk],
+        prev = cloned._data[kk];
+      if (next instanceof Collection && prev instanceof Collection && next._type === prev._type) {
+        cloned._data[kk] = prev.merge(next);
+      } else {
+        cloned._data[kk] = next;
+      }
+    }
+  } else { // function
+    for (const kk in value._data) {
+      const next = value._data[kk],
+        prev = cloned._data[kk];
+      cloned._data[kk] = strategy(prev, next, kk);
+    }
+  }
+
+  cloned._json = null;
+
+  return cloned;
+};
+
 Collection.prototype.toJS = Collection.prototype.toJSON = function toJSON() {
   if (this._json) return this._json;
 

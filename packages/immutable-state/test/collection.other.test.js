@@ -3,46 +3,6 @@ const assert = require('assert');
 const { List, Map, createStore } = require('..');// eslint-disable-line no-shadow
 
 describe('immutable-state: collection other methods', function () {
-  describe('.toJSON()', function () {
-    it('should work with empty initial data', function () {
-      assert.deepStrictEqual(Map().toJSON(), {});
-      assert.deepStrictEqual(List().toJSON(), []);
-    });
-    it('should not change initial data', function () {
-      const obj = {},
-        arr = [];
-      assert.strictEqual(Map(obj).toJSON(), obj);
-      assert.strictEqual(List(arr).toJSON(), arr);
-    });
-    it('should not touch json without any change', function () {
-      const json = { str: 'hello', list: [1] };
-      const store = createStore(json);
-      assert.strictEqual(store.getState().toJSON(), json);
-      store.mutate(() => null);
-      assert.strictEqual(store.getState().toJSON(), json);
-      store.mutate((newState) => {
-        newState.set('str', 'hello');
-      });
-      assert.strictEqual(store.getState().toJSON(), json);
-    });
-    it('should get new json with mutation', function () {
-      const json = { str: 'hello', list: [1] };
-      const store = createStore(json);
-      store.mutate((newState) => {
-        newState.set('str', 'world');
-      });
-      assert.notEqual(store.getState().toJSON(), json);
-      assert.deepStrictEqual(store.getState().toJSON(), { str: 'world', list: [1] });
-    });
-    it('should reset json when changing a list', function () {
-      const store = createStore({ list: [] });
-      store.mutate((newState) => {
-        newState.set('list', value => value.set(0, 1));
-        assert.deepStrictEqual(newState.get(['list', 0]), 1);
-      });
-      assert.deepStrictEqual(store.getState().toJSON(), { list: [1] });
-    });
-  });
   it('.keys()', function () {
     assert.deepStrictEqual(Map().keys(), []);
     assert.deepStrictEqual(Map({ a: 1, b: 2 }).keys(), ['a', 'b']);
