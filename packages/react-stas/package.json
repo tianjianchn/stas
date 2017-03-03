@@ -1,7 +1,7 @@
 {
   "name": "react-stas",
   "description": "React bindings for stas",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
