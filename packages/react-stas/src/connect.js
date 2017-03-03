@@ -3,7 +3,7 @@ const React = require('react');
 const { PureComponent, PropTypes } = React;
 const { Store } = require('stas');
 
-function connect(mapToProps = defaultMapToProps) {
+function connect(selector = defaultSelector) {
   return (TargetComponent) => {
     class ConnectComponent extends PureComponent {
       static propTypes = {
@@ -17,10 +17,10 @@ function connect(mapToProps = defaultMapToProps) {
         super(props, context);
 
         const { store } = context;
-        this.state = { ...this.getMapProps(store.state) };
+        this.state = { ...this.getPropsForTargetComponent(store.state) };
 
         this._unsubscribe = store.subscribe((newState) => {
-          this.setState({ ...this.getMapProps(newState) });
+          this.setState({ ...this.getPropsForTargetComponent(newState) });
         });
       }
 
@@ -31,24 +31,25 @@ function connect(mapToProps = defaultMapToProps) {
         }
       }
 
-      getMapProps(state) {
-        const dispatch = this.context.store.dispatch;
-        const mprops = mapToProps(state, dispatch);
-        if (!mprops) return { state, dispatch };
-        if (!mprops.dispatch) mprops.dispatch = dispatch;
-        return mprops;
+      getPropsForTargetComponent(state) {
+        const { store } = this.context;
+        const dispatch = store.dispatch;
+        const selectorParams = { state, dispatch, props: this.props, store };
+        const props = selector(selectorParams) || defaultSelector(selectorParams);
+        if (!props.dispatch) props.dispatch = dispatch;
+        return props;
       }
 
       render() {
-        return <TargetComponent {...this.props} {...this.state} />;
+        return <TargetComponent {...this.state} />;
       }
     }
     return ConnectComponent;
   };
 }
 
-function defaultMapToProps(state, dispatch) {
-  return { state, dispatch };
+function defaultSelector({ state, dispatch, props }) {
+  return { ...props, state, dispatch };
 }
 
 module.exports = connect;
