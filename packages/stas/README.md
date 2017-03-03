@@ -68,7 +68,7 @@ class TodoListPage extends PureComponent{
   }
 }
 
-connect((state, dispatch)=>{
+connect(({state, dispatch, props})=>{
   return {tasks: state.tasks}
 })(TodoListPage)
 ```

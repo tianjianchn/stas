@@ -36,8 +36,7 @@ function connect(selector = defaultSelector) {
         const dispatch = store.dispatch;
         const selectorParams = { state, dispatch, props: this.props, store };
         const props = selector(selectorParams) || defaultSelector(selectorParams);
-        if (!props.dispatch) props.dispatch = dispatch;
-        return props;
+        return {...this.props, dispatch, ...props};
       }
 
       render() {
@@ -49,7 +48,7 @@ function connect(selector = defaultSelector) {
 }
 
 function defaultSelector({ state, dispatch, props }) {
-  return { ...props, state, dispatch };
+  return { state };
 }
 
 module.exports = connect;

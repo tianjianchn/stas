@@ -77,7 +77,9 @@ class TodoListPage extends PureComponent {
   }
 }
 
-export default connect((state, dispatch) => ({ tasks: state.get('tasks').toJSON() }))(TodoListPage);
+export default connect(({state, dispatch, props}) => {
+  return { tasks: state.get('tasks').toJSON() }
+})(TodoListPage);
 ```
 
 `index.js` file:
