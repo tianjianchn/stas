@@ -3,9 +3,9 @@ const { Store: StasStore } = require('stas');
 const ImmStore = require('immutable-state');
 
 class StasImmutableStore extends StasStore {
-  constructor(initialState) {
+  constructor(initialState, { models = [] } = {}) {
     super(initialState);
-    this._storage = new ImmStore(initialState);
+    this._storage = new ImmStore(initialState, { models });
     this._state = this._storage.getState();
   }
 

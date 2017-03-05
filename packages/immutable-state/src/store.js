@@ -9,6 +9,9 @@ global._IMS_MUTATE_OPERATION_ = {
 
   // current store that is doing mutatation operation
   store: null,
+
+  // new state of store for current operation
+  state: null,
 };
 const operation = global._IMS_MUTATE_OPERATION_;
 
@@ -17,7 +20,7 @@ const Collection = require('./collection');
 const Map = require('./map');// eslint-disable-line no-shadow
 const List = require('./list');
 
-function Store(initialData) {
+function Store(initialData, { models: models = [] } = {}) {
   if (!(this instanceof Store)) {
     throw new Error('Cannot call Store() without new');
   }
@@ -27,6 +30,27 @@ function Store(initialData) {
   else if (Array.isArray(initialData)) this._state = new List(initialData);
   else if (isPlainObject(initialData)) this._state = new Map(initialData);
   else throw new Error('Invalid initial state when creating store');
+
+  if (!models || models.length <= 0) return;
+  if (!(this._state instanceof Map)) {
+    throw new Error('Only support map type state with models');
+  }
+  this._models = {};
+
+  const modelsData = {};
+  models.forEach((model) => {
+    modelsData[model.name] = {};
+    this._models[model.name] = model;
+  });
+
+  models.forEach((model) => {
+    model.bindStore(this);
+    this[model.name] = model;
+  });
+
+  this.mutate((newState) => {
+    this._state = new Map({ __models__: modelsData }).merge(this._state);
+  });
 }
 
 Store.prototype._state = null;// instance of Collection
@@ -45,12 +69,15 @@ Store.prototype.mutate = function mutate(callback) {
     operation.store = this;
 
     const newState = this._state._clone();
+    operation.state = newState;// attach the new state, which will be used by models
+
     callback(newState);
 
     const isChanged = newState._isChanged();
     if (isChanged) this._state = newState;
   } finally {
     operation.store = null;
+    operation.state = null;
   }
 };
 
