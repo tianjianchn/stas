@@ -52,6 +52,28 @@ Model.prototype.bindStore = function bindStore(store) {
   validate.call(this);
 };
 
+function getState(isMutatation) {
+  const { store, state } = operation;
+
+  if (isMutatation) {
+    if (!state) {
+      throw new Error('Cannot mutate the state outside store.mutate()');
+    }
+    if (this._store !== store) {
+      throw new Error(`The store of model ${this._name} is not in mutation operation`);
+    }
+    return state;
+  } else {
+    if (state) { // under mutation
+      if (this._store !== store) {
+        throw new Error(`The store of model ${this._name} is not in mutation operation`);
+      }
+      return state;
+    }
+    return this._store.state;
+  }
+}
+
 // merge the plain json data to the model, return id(s)
 Model.prototype.merge = function merge(input) {
   if (!input) return input;
@@ -69,13 +91,7 @@ Model.prototype.merge = function merge(input) {
     }
   });
 
-  const { store, state } = operation;
-  if (!state) {
-    throw new Error('Cannot mutate the state outside store.mutate()');
-  }
-  if (this._store !== store) {
-    throw new Error(`The store of model ${this._name} is not in mutation operation`);
-  }
+  const state = getState.call(this, true);
   state.set(['__models__', this._name, input.id], value => (value ? value.merge(input) : input));
   return input.id;
 };
@@ -83,15 +99,8 @@ Model.prototype.merge = function merge(input) {
 Model.prototype.get = function get(id) {
   if (!id) return null;
 
-  const { store, state } = operation;
-  if (state) { // under mutation
-    if (this._store !== store) {
-      throw new Error(`The store of model ${this._name} is not in mutation operation`);
-    }
-    return state.get(['__models__', this._name, id]);
-  } else {
-    return this._store.state.get(['__models__', this._name, id]);
-  }
+  const state = getState.call(this);
+  return state.get(['__models__', this._name, id]);
 };
 
 Model.prototype.mget = function mget(...args) {
@@ -107,5 +116,16 @@ Model.prototype.mget = function mget(...args) {
   });
   return result;
 };
+
+Model.prototype.set = function set(id, value) {
+  const state = getState.call(this, true);
+  state.set(['__models__', this._name, id], value);
+};
+
+Model.prototype.remove = function remove(id) {
+  const state = getState.call(this, true);
+  state.remove(['__models__', this._name, id]);
+};
+
 
 module.exports = Model;

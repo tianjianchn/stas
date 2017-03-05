@@ -159,5 +159,33 @@ describe('immutable-state: model', function () {
       });
     });
   });
+
+  describe('.set()', function () {
+    it('should set the id with new record', function () {
+      const User = new Model('User');
+      const store = new Store({ __models__: {
+        User: { 1: { id: 1, name: 'Tian' } } },
+      }, { models: [User] });
+      store.mutate((newState) => {
+        User.set(1, { id: 1, name: 'Jian' });
+      });
+      assert.deepStrictEqual(store.state.toJSON(), { __models__: {
+        User: { 1: { id: 1, name: 'Jian' } } } });
+    });
+  });
+
+  describe('.remove()', function () {
+    it('should remove record', function () {
+      const User = new Model('User');
+      const store = new Store({ __models__: {
+        User: { 1: { id: 1, name: 'Tian' } } },
+      }, { models: [User] });
+      store.mutate((newState) => {
+        User.remove(1);
+      });
+      assert.deepStrictEqual(store.state.toJSON(), { __models__: {
+        User: {} } });
+    });
+  });
 });
 

@@ -88,6 +88,11 @@ describe('immutable-state: collection other methods', function () {
       assert.deepStrictEqual(newState.remove(0).toJSON(), [2]);
       assert.deepStrictEqual(newState.remove(0).toJSON(), []);
     });
+
+    const store2 = new Store({ a: { b: 1 } });
+    store2.mutate((newState) => {
+      assert.deepStrictEqual(newState.remove(['a', 'b']).toJSON(), { a: {} });
+    });
   });
 });
 
