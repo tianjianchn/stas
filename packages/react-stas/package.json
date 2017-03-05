@@ -1,7 +1,7 @@
 {
   "name": "react-stas",
   "description": "React bindings for stas",
-  "version": "0.1.12",
+  "version": "0.2.0",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -13,10 +13,10 @@
   "dependencies": {},
   "peerDependencies": {
     "react": "^15.4.0",
-    "stas-core": "^0.1.11"
+    "stas-core": "^0.2.0"
   },
   "devDependencies": {
-    "stas-core": "^0.1.11"
+    "stas-core": "^0.2.0"
   },
   "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/react-stas",
   "repository": "https://github.com/tianjianchn/stas/tree/master/packages/react-stas",

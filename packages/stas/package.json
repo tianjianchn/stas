@@ -1,7 +1,7 @@
 {
   "name": "stas",
   "description": "A state management with promise middleware, immutable data and model normalization",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -11,8 +11,8 @@
     "node": ">= 4"
   },
   "dependencies": {
-    "immutable-state": "^0.1.7",
-    "stas-core": "^0.1.11"
+    "immutable-state": "^0.2.0",
+    "stas-core": "^0.2.0"
   },
   "devDependencies": {},
   "homepage": "https://github.com/tianjianchn/stas",
