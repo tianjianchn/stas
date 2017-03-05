@@ -144,6 +144,15 @@ ReactDom.render(
 
 ```
 
+### Installation
+```js
+yarn add stas react-stas uni-router -S
+```
+or if your'd like to use npm:
+```js
+npm install stas react-stas uni-router -S
+```
+
 ### Middleware
 
 #### store.use((req, resp, next)=>{})
@@ -223,7 +232,7 @@ Like `array.shift`. `List` only.
 ### Hot Reload(HMR)
 Since react-native doesn't support module.hot.accept(path, callback) but module.hot.accept(callback), we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
 ```js
-import Store from 'stas-immutable';
+import Store from 'stas';
 import routers from './routers';
 
 export default function createStore() {
