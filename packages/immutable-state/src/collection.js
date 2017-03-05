@@ -230,6 +230,10 @@ Collection.prototype._fromJSON = function _fromJSON(value) {
 
 // in list it looks like .splice(index, 1)
 Collection.prototype.delete = Collection.prototype.remove = function remove(key) {
+  if (Array.isArray(key)) {
+    return this.set(key.slice(0, -1), value => value.remove(key[key.length - 1]));
+  }
+
   if (this._type === 'list') {
     key = parseListKey(this, key, true);
     if (key === undefined) throw new Error('Invalid key in remove() on list, should be number or number string');
