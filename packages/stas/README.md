@@ -144,23 +144,81 @@ ReactDom.render(
 
 ```
 
-### Immutable State
-State is immutable by using [immutable-state](/packages/immutable-state). Most operations are like [immutable-js](https://github.com/facebook/immutable-js/). 
-You must use mutation methods(like `.set()`, `.remove()`) in `store.mutate()`, while others(like `.get()`, `.filter()`) are not.
-
-#### store.mutate(callback)
-Start a new mutation operation. You should call all mutation methods in `callback` function. `callback` should use sync code, no promise or `async/await`.
-
-#### .get(keysPath)
-
-#### .set(keysPath)
-
 ### Middleware
 
 #### store.use((req, resp, next)=>{})
 
 ### Router
-See [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
+Like express router but with promise support. For detail see [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
+
+#### router.use(pattern?: string, middleare)
+Prefix match `req.url` with pattern
+
+#### router.all(pattern?: string, middleare)
+Exact match `req.url` with pattern
+
+### Immutable State
+Use `List`, `Map` and `Model` to manipulate the state. For detail see [immutable-state](/packages/immutable-state).
+
+#### store.mutate(callback)
+Start a new mutation operation. 
+
+#### .get(keysPath: array|string)
+Get the value on the specific keys path. 
+
+#### .set(keysPath: array|string, value: json|function)
+Set the value on the specific keys path. If passed function, the function must return the result value.
+
+#### .toJSON() or .toJS()
+Convert to plain json object
+
+#### .keys()
+Return the keys
+
+#### .length or .size
+Return the keys length
+
+#### .filter((value, key, this)=>bool)
+Like `array.filter`
+
+#### .find((value, key, this)=>bool)
+Like `array.find`
+
+#### .findKey((value, key, this)=>bool)
+Like `array.findIndex`
+
+#### .forEach((value, key, this)=>void)
+Like `array.forEach`
+
+#### .map((value, key, this)=>any)
+Like `array.map`
+
+#### .reduce((value, key, this)=>any, initialData)
+Like `array.reduce`
+
+#### .remove(keyPath) or .delete(keyPath)
+Remove the leaf key
+
+#### .merge(strategy?: bool|function, input)
+Merge the value with specific strategy. 
+
+#### .slice(start, end)
+Like `array.slice`. `List` only.
+
+#### .findIndex((value, index, this)=>bool)
+Like `array.findIndex`. `List` only.
+
+#### .push(value)
+Like `array.push`. `List` only.
+
+#### .pop()
+Like `array.pop`. `List` only.
+
+#### .unshift(value)
+Like `array.unshift`. `List` only.
+
+#### .shift()
+Like `array.shift`. `List` only.
 
 ### Contributing
 Checkout the [CONTRIBUTING.md](/CONTRIBUTING.md) if you want to help

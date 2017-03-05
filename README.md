@@ -1,22 +1,28 @@
-A promise-based, middleware-driven, express-like and immutable built-in state management
+A state management with promise middleware, immutable data and model normalization
 =================================
 
 ### Features
-* Immutable state and operations, see [Immutable State](#immutable-state)
 * Express-like and promise-based middlewares and routers, see [Middleware](#middleware) and [Router](#router)
+* Immutable state and operations, see [Immutable State](#immutable-state)
+* Normalize the data by model
 
 ### Example
 `store.js` file:
 ```js
+import { Store, Model } from 'stas';
 import router from './router';
-import Store from 'stas-immutable';
 
-const store = new Store({
-  tasks: [],
+const User = new Model('User', {
+  posts: 'Post',
 });
-export default store;
+const Post = new Model('Post', {
+  author: 'User',
+});
 
+const store = new Store({ users: [] }, { models: [User, Post] });
 store.use(router);
+
+module.exports = store;
 ```
 
 `router.js` file:
@@ -24,62 +30,102 @@ store.use(router);
 import createRouter from 'uni-router';
 
 const router = createRouter();
-export default router;
 
-router.all('/add-task', async (req, resp, next) => {
+router.all('/users/query', async (req, resp, next) => {
   const { store } = req,
-    { text } = req.body;
-  const result = await fetch('/server/add-task', { text });
-  const { id } = result;
+    { offset, limit } = req.body;
+
+  const result = await fetch('/api/users/query', { offset, limit });
+
   store.mutate((newState) => {
-    newState.set('tasks', tasks => tasks.push({ id, text, completed: false }));
+    const ids = store.User.merge(result);
+    newState.set('users', ids);
   });
 });
-router.all('/toggle-task', (req, resp, next) => {
+
+router.all('/users/:userId/posts/create', async (req, resp, next) => {
   const { store } = req,
-    { id } = req.body;
+    { userId } = req.params,
+    { title } = req.body;
+
+  const result = await fetch(`/api/users/${userId}/posts/create`, { title });
+
   store.mutate((newState) => {
-    newState.set('tasks', (tasks) => {
-      const index = tasks.findIndex(t => t.id === id);
-      const completed = tasks.get([index, 'completed']);
-      tasks = tasks.set([index, 'completed'], !completed);
-      return tasks;
-    });
+    const postId = store.Post.merge(result);
+    const user = store.User.get(userId).set('posts', posts => posts.push(postId));
+    store.User.set(userId, user);
   });
 });
+
+module.exports = router;
+
 ```
 
-`TodoListPage.js` file:
+`UserListPage.js` file:
 ```js
 import { PureComponent, PropTypes } from 'react';
 import { connect } from 'react-stas';
 
-class TodoListPage extends PureComponent {
+class UserListPage extends PureComponent {
   static propTypes = {
-    tasks: PropTypes.array.isRequired,
+    users: PropTypes.array.isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
-  onPressAddTask = () => this.props.dispatch('/add-task', { text: `Current Time: ${Date.now()}` })
-
-  onPressToggleTask = id => this.props.dispatch('/toggle-task', { id })
+  static contextTypes = {
+    router: PropTypes.object,
+  }
 
   render() {
-    return (<div>
-      <button onClick={this.onPressAddTask}>Add Task</button>
-      <ul>
-        {this.props.tasks.map((task, index) => <li key={index}>
-          <input type="checkbox" value={task.completed} onClick={() => this.onPressToggleTask(task.id)} />
-          <span>{task.get('text')}</span>
-        </li>)}
-      </ul>
-    </div>);
+    const { users } = this.props;
+    const { router } = this.context;
+    return (<ul>
+      {users.map(user => <li onClick={() => router.push(`/users/${user.id}`)}>
+        <span>{user.name}</span>
+      </li>)}
+    </ul>);
   }
 }
 
-export default connect(({state, dispatch, props}) => {
-  return { tasks: state.get('tasks').toJSON() }
-})(TodoListPage);
+module.exports = connect(({ state, dispatch, props }) => ({ users: state.get('users').toJSON() }))(UserListPage);
+
+```
+
+
+`UserPostsPage.js` file:
+```js
+import { PureComponent, PropTypes } from 'react';
+import { connect } from 'react-stas';
+
+class UserPostsPage extends PureComponent {
+  static propTypes = {
+    user: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  onPressAddTask = () => {
+    const { user, dispatch } = this.props;
+    dispatch(`/users/${user.id}/posts/create`, { title: `New Post ${Date.now()}` });
+  }
+
+  render() {
+    const { user } = this.props;
+    const { posts } = user;
+    return (<ul>
+      <button onClick={this.onPressAddPost}>Add Post</button>
+      {posts.map(post => <li>
+        <span>{post.title}</span>
+      </li>)}
+    </ul>);
+  }
+}
+
+module.exports = connect(({ state, dispatch, props, store }) => {
+  const user = store.User.get(props.userId).toJSON();
+  user.posts = user.posts.map(postId => store.Post.get(postId).toJSON());
+  return { user };
+})(UserPostsPage);
+
 ```
 
 `index.js` file:
@@ -87,63 +133,92 @@ export default connect(({state, dispatch, props}) => {
 import ReactDom from 'react-dom';
 import { Provider } from 'react-stas';
 import store from './store';
-import TodoListPage from './TodoListPage';
+import UserListPage from './UserListPage';
 
 ReactDom.render(
-  <Provider store={store}><TodoListPage /></Provider>,
+  <Provider store={store}>
+    <UserListPage />
+  </Provider>,
   document.getElementById('app'),
 );
+
 ```
-
-### Immutable State
-State is immutable by using [immutable-state](/packages/immutable-state)(most operations are like [immutable-js](https://github.com/facebook/immutable-js/)). 
-Mutation methods(like `.set()`, `.remove()`) must be used in `store.mutate()`, while others(like `.get()`, `.filter()`) are not.
-
-#### store.mutate(callback)
-Start a new mutation operation. You should call all mutation methods in `callback` function. `callback` should use sync code, no promise or `async/await`.
-
-#### .get(keysPath)
-
-#### .set(keysPath, value), .set(keysPath, callback)
-
-#### .remove(key)
-
-#### .keys()
-
-#### .findIndex()/.find()/.findKey()
-
-#### .forEach()/.map()/.filter()/.slice()/.reduce()
-
-#### .push()/.pop()/.shift()/.unshift()
 
 ### Middleware
 
 #### store.use((req, resp, next)=>{})
 
 ### Router
-See [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
+Like express router but with promise support. For detail see [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
 
-### Hot Reload(HMR)
-Since react-native doesn't support `module.hot.accept(path, callback)` but `module.hot.accept(callback)`, we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
+#### router.use(pattern?: string, middleare)
+Prefix match `req.url` with pattern
 
-```js
-import Store from 'stas-immutable';
-import routers from './routers';
+#### router.all(pattern?: string, middleare)
+Exact match `req.url` with pattern
 
-export default function configureStore() {
-  const store = new Store()
-  store.use(routers);
+### Immutable State
+Use `List`, `Map` and `Model` to manipulate the state. For detail see [immutable-state](/packages/immutable-state).
 
-  if (module.hot) {
-    module.hot.accept(() => {
-      const newRouters = require('./routers').default;
-      store.clearMiddlewares();
-      store.use(newRouters);
-    });
-  }
-  return store;
-}
-```
+#### store.mutate(callback)
+Start a new mutation operation. 
+
+#### .get(keysPath: array|string)
+Get the value on the specific keys path. 
+
+#### .set(keysPath: array|string, value: json|function)
+Set the value on the specific keys path. If passed function, the function must return the result value.
+
+#### .toJSON() or .toJS()
+Convert to plain json object
+
+#### .keys()
+Return the keys
+
+#### .length or .size
+Return the keys length
+
+#### .filter((value, key, this)=>bool)
+Like `array.filter`
+
+#### .find((value, key, this)=>bool)
+Like `array.find`
+
+#### .findKey((value, key, this)=>bool)
+Like `array.findIndex`
+
+#### .forEach((value, key, this)=>void)
+Like `array.forEach`
+
+#### .map((value, key, this)=>any)
+Like `array.map`
+
+#### .reduce((value, key, this)=>any, initialData)
+Like `array.reduce`
+
+#### .remove(keyPath) or .delete(keyPath)
+Remove the leaf key
+
+#### .merge(strategy?: bool|function, input)
+Merge the value with specific strategy. 
+
+#### .slice(start, end)
+Like `array.slice`. `List` only.
+
+#### .findIndex((value, index, this)=>bool)
+Like `array.findIndex`. `List` only.
+
+#### .push(value)
+Like `array.push`. `List` only.
+
+#### .pop()
+Like `array.pop`. `List` only.
+
+#### .unshift(value)
+Like `array.unshift`. `List` only.
+
+#### .shift()
+Like `array.shift`. `List` only.
 
 ### Contributing
 Checkout the [CONTRIBUTING.md](/CONTRIBUTING.md) if you want to help

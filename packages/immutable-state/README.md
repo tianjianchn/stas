@@ -84,8 +84,8 @@ Like `array.map`
 #### .reduce((value, key, this)=>any, initialData)
 Like `array.reduce`
 
-#### .remove(key) or .delete(key)
-Remove the key
+#### .remove(keysPath) or .delete(keysPath)
+Remove the leaf key
 
 #### .merge(strategy?: bool|function, input)
 Merge the value with specific strategy. Strategy is used when conflict(same key with different values). If not specify strategy, it will overwrite the old value. If strategy equals to `true`, it will do deep merge. If strategy is a function, it will call that function with `(prev, next)=>any`
