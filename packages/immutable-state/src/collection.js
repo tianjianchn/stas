@@ -84,7 +84,7 @@ Collection.prototype.filter = function filter(callback) {
     const result = {};
     Object.keys(this._data).forEach((key) => {
       const value = this._data[key];
-      if (callback(value, key)) {
+      if (callback(value, key, this)) {
         result[key] = value;
       }
     });
@@ -96,7 +96,7 @@ Collection.prototype.filter = function filter(callback) {
 Collection.prototype.find = function find(callback) {
   if (this._type === 'list') return this._fromJSON(this._data.find(callback));
   else {
-    const key = Object.keys(this._data).find(k => callback(this._data[k], k));
+    const key = Object.keys(this._data).find(k => callback(this._data[k], k, this));
     if (key === undefined) return undefined;
     return this._fromJSON(this._data[key]);
   }
@@ -111,7 +111,7 @@ Collection.prototype.findKey = function findIndex(callback) {
     return index;
   } else {
     const keys = Object.keys(this._data);
-    const index = keys.findIndex(key => callback(this._data[key], key));
+    const index = keys.findIndex(key => callback(this._data[key], key, this));
     return keys[index];
   }
 };
@@ -120,7 +120,7 @@ Collection.prototype.findKey = function findIndex(callback) {
 Collection.prototype.forEach = function forEach(callback) {
   if (this._type === 'list') return this._data.forEach(callback);
   else {
-    return Object.keys(this._data).forEach(key => callback(this._data[key], key));
+    return Object.keys(this._data).forEach(key => callback(this._data[key], key, this));
   }
 };
 
@@ -129,7 +129,7 @@ Collection.prototype.map = function map(callback) {
   else {
     const result = {};
     Object.keys(this._data).forEach((key) => {
-      result[key] = callback(this._data[key], key);
+      result[key] = callback(this._data[key], key, this);
     });
     return this._fromJSON(result);
   }
@@ -138,7 +138,9 @@ Collection.prototype.map = function map(callback) {
 Collection.prototype.reduce = function reduce(callback, initialValue) {
   if (this._type === 'list') return this._fromJSON(this._data.reduce(callback, initialValue));
   else {
-    return this._fromJSON(Object.keys(this._data).reduce((result, key) => callback(result, this._data[key], key), initialValue));
+    const result = Object.keys(this._data)
+      .reduce((prev, key) => callback(prev, this._data[key], key, this), initialValue);
+    return this._fromJSON(result);
   }
 };
 
