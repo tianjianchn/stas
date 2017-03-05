@@ -3,8 +3,8 @@ const assert = require('assert');
 // const { inspect } = require('util');
 const Store = require('..');
 
-describe('immutable-state: usage', function () {
-  it('should work with tasks example', function () {
+describe('immutable-state: example todo list', function () {
+  it('should work', function () {
     const store = new Store({
       tasks: [],
       filter: 'all', //visibility filter, all/active

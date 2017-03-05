@@ -1,5 +1,6 @@
 
 const assert = require('assert');
+const createRouter = require('uni-router');
 const Store = require('..');
 
 describe('stas-immutable: basic', function () {
@@ -47,6 +48,26 @@ describe('stas-immutable: basic', function () {
         }, 10);
       }
     });
+    store.dispatch('/a');
+  });
+  it('should work with router', function (done) {
+    const store = new Store({ str: 'hello' });
+    store.subscribe((newState, oldState) => {
+      assert.deepStrictEqual(oldState.toJSON(), { str: 'hello' });
+      assert.deepStrictEqual(newState.toJSON(), { str: 'world' });
+      done();
+    });
+    const router = createRouter();
+    router.all('/a', (req, resp, next) => {
+      if (req.url === '/a') {
+        setTimeout(() => {
+          store.mutate((newState) => {
+            newState.set('str', 'world');
+          });
+        }, 10);
+      }
+    });
+    store.use(router);
     store.dispatch('/a');
   });
 });
