@@ -1,6 +1,6 @@
 {
   "name": "stas",
-  "description": "A promise-based, middleware-driven and express-like state management",
+  "description": "A state management with promise middleware, immutable data and model normalization",
   "version": "0.1.11",
   "scripts": {},
   "main": "dist/index.js",
@@ -11,7 +11,8 @@
     "node": ">= 4"
   },
   "dependencies": {
-    "uni-compose": "^0.1.0"
+    "immutable-state": "^0.1.7",
+    "stas-core": "^0.1.11"
   },
   "devDependencies": {},
   "homepage": "https://github.com/tianjianchn/stas",
@@ -26,6 +27,7 @@
     "stas",
     "flux",
     "state",
+    "immutable",
     "express",
     "middleware",
     "use",

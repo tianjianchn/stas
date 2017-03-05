@@ -1,6 +1,6 @@
 {
-  "name": "stas-immutable",
-  "description": "A state management with promise middleware, immutable data and model normalization",
+  "name": "stas-core",
+  "description": "State management with promise-based middleware",
   "version": "0.1.11",
   "scripts": {},
   "main": "dist/index.js",
@@ -11,12 +11,11 @@
     "node": ">= 4"
   },
   "dependencies": {
-    "immutable-state": "^0.1.7",
-    "stas": "^0.1.11"
+    "uni-compose": "^0.1.0"
   },
   "devDependencies": {},
-  "homepage": "https://github.com/tianjianchn/stas",
-  "repository": "https://github.com/tianjianchn/stas",
+  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-core",
+  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/stas-core",
   "bugs": "https://github.com/tianjianchn/stas/issues",
   "license": "MIT",
   "author": {
@@ -27,7 +26,6 @@
     "stas",
     "flux",
     "state",
-    "immutable",
     "express",
     "middleware",
     "use",

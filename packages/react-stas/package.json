@@ -13,10 +13,10 @@
   "dependencies": {},
   "peerDependencies": {
     "react": "^15.4.0",
-    "stas": "^0.1.11"
+    "stas-core": "^0.1.11"
   },
   "devDependencies": {
-    "stas": "^0.1.11"
+    "stas-core": "^0.1.11"
   },
   "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/react-stas",
   "repository": "https://github.com/tianjianchn/stas/tree/master/packages/react-stas",

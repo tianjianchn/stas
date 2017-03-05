@@ -1,6 +1,6 @@
 
 const { Component, PropTypes, Children } = require('react');
-const { Store } = require('stas');
+const { Store } = require('stas-core');
 
 class Provider extends Component {
   static propTypes = {

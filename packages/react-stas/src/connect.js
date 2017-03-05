@@ -1,7 +1,7 @@
 
 const React = require('react');
 const { PureComponent, PropTypes } = React;
-const { Store } = require('stas');
+const { Store } = require('stas-core');
 
 function connect(selector = defaultSelector) {
   return (TargetComponent) => {
