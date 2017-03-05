@@ -18,6 +18,10 @@ const Map = require('./map');// eslint-disable-line no-shadow
 const List = require('./list');
 
 function Store(initialData) {
+  if (!(this instanceof Store)) {
+    throw new Error('Cannot call Store() without new');
+  }
+
   if (!initialData) this._state = new Map();
   else if (initialData instanceof Collection) this._state = initialData;
   else if (Array.isArray(initialData)) this._state = new List(initialData);

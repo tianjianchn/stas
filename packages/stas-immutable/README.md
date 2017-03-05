@@ -9,8 +9,8 @@ A promise-based, middleware-driven, express-like and immutable built-in state ma
 `store.js` file:
 ```js
 const router = reuqire('./router');
-const {createStore} = require('stas-immutable');
-const store = createStore({
+const Store = require('stas-immutable');
+const store = new Store({
   tasks: [],
 });
 store.use(router)

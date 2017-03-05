@@ -1,21 +1,21 @@
 
 const assert = require('assert');
-const { createStore, Store } = require('..');
+const Store = require('..');
 
 describe('stas: basic', function () {
   it('should work with empty initial state', function () {
-    const store = createStore();
+    const store = new Store();
     assert.deepStrictEqual(store.state, undefined);
   });
   it('should work with initial state', function () {
     const initialState = { count: 0 };
-    const store = createStore(initialState);
+    const store = new Store(initialState);
     assert.strictEqual(store.state, initialState);
     assert.deepStrictEqual(store.state, { count: 0 });
   });
 
   it('should not change old state', function () {
-    const store = createStore();
+    const store = new Store();
     const oldState = store.state;
     store.setState({});
     assert.deepStrictEqual(store.state, { });
@@ -28,7 +28,7 @@ describe('stas: basic', function () {
     assert.strictEqual(store.state, newState);
   });
   it('should work with literal value', function () {
-    const store = createStore();
+    const store = new Store();
     store.setState(null);
     assert.deepStrictEqual(store.state, null);
     store.setState(undefined);
@@ -40,7 +40,7 @@ describe('stas: basic', function () {
   });
   it('should keep silence when change state property', function () {
     const state = { a: 1 };
-    const store = createStore(state);
+    const store = new Store(state);
     store.subscribe(() => {
       throw new Error('should not reach here');
     });
@@ -55,7 +55,7 @@ describe('stas: basic', function () {
     assert.deepStrictEqual(store.state, { a: 2 });
   });
   it('should trigger subscribers after state changed', function (done) {
-    const store = createStore({ a: '' });
+    const store = new Store({ a: '' });
     store.subscribe((newState, oldState) => {
       assert.deepStrictEqual(oldState, { a: '' });
       assert.deepStrictEqual(newState, { a: 1 });
@@ -65,7 +65,7 @@ describe('stas: basic', function () {
   });
   describe('.dispatch()', function () {
     it('should bound this with store', function () {
-      const store = createStore();
+      const store = new Store();
       const dispatch = store.dispatch;
       dispatch('/');// shoud not throw
     });

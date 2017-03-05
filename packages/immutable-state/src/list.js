@@ -3,19 +3,23 @@ const isPlainObject = require('lodash.isplainobject');
 const { inherits } = require('./util');
 const Collection = require('./collection');
 
-function List(initialData) {
-  Collection.call(this, initialData);
+function List(...args) {
+  if (!(this instanceof List)) {
+    throw new Error('Cannot call List() without new');
+  }
+  Collection.apply(this, args);
 
+  const [initialData] = args;
   if (initialData) {
     if (Array.isArray(initialData)) {
-      const Map2 = require('./map');
+      const Map = require('./map');// eslint-disable-line no-shadow
 
       Object.keys(initialData).forEach((key) => {
         const value = initialData[key];
         if (Array.isArray(value)) {
           this._data[key] = new List(value);
         } else if (isPlainObject(value)) {
-          this._data[key] = new Map2(value);
+          this._data[key] = new Map(value);
         } else this._data[key] = value;
       });
       this._json = initialData;

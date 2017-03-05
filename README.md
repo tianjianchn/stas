@@ -9,9 +9,9 @@ A promise-based, middleware-driven, express-like and immutable built-in state ma
 `store.js` file:
 ```js
 import router from './router';
-import { createStore } from 'stas-immutable';
+import Store from 'stas-immutable';
 
-const store = createStore({
+const store = new Store({
   tasks: [],
 });
 export default store;
@@ -127,11 +127,11 @@ See [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-ro
 Since react-native doesn't support `module.hot.accept(path, callback)` but `module.hot.accept(callback)`, we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
 
 ```js
-import { createStore } from 'stas-immutable';
+import Store from 'stas-immutable';
 import routers from './routers';
 
 export default function configureStore() {
-  const store = createStore()
+  const store = new Store()
   store.use(routers);
 
   if (module.hot) {

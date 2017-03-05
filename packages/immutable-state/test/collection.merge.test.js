@@ -1,11 +1,11 @@
 
 const assert = require('assert');
-const { createStore } = require('..');// eslint-disable-line no-shadow
+const Store = require('..');// eslint-disable-line no-shadow
 
 describe('immutable-state: collection.merge()', function () {
   describe('normal strategy', function () {
     it('should overwrite literal values in map', function () {
-      const store = createStore({ str: 'hello', num: 1, bool: true });
+      const store = new Store({ str: 'hello', num: 1, bool: true });
       store.mutate((newState) => {
         newState.merge({ str: 'world' });
         assert.deepStrictEqual(newState.get('str'), 'world');
@@ -17,7 +17,7 @@ describe('immutable-state: collection.merge()', function () {
       });
     });
     it('should overwrite literal values in list', function () {
-      const store = createStore(['hello', 1, true]);
+      const store = new Store(['hello', 1, true]);
       store.mutate((newState) => {
         newState.merge(['world']);
         assert.deepStrictEqual(newState.get(0), 'world');
@@ -32,12 +32,12 @@ describe('immutable-state: collection.merge()', function () {
       });
     });
     it('should overwrite collection values', function () {
-      const store = createStore({ strs: ['hello', 'world'] });
+      const store = new Store({ strs: ['hello', 'world'] });
       store.mutate((newState) => {
         newState.merge({ strs: ['world'] });
         assert.deepStrictEqual(newState.get('strs').toJSON(), ['world']);
       });
-      const store1 = createStore([{ str: 'hello', num: 1 }]);
+      const store1 = new Store([{ str: 'hello', num: 1 }]);
       store1.mutate((newState) => {
         newState.merge([{ str: 'world' }]);
         assert.deepStrictEqual(newState.get(0).toJSON(), { str: 'world' });
@@ -47,19 +47,19 @@ describe('immutable-state: collection.merge()', function () {
 
   describe('deep strategy', function () {
     it('should deeply overwrite the values with same collection type', function () {
-      const store = createStore({ strs: ['hello', 'world'] });
+      const store = new Store({ strs: ['hello', 'world'] });
       store.mutate((newState) => {
         newState.merge(true, { strs: ['world'] });
         assert.deepStrictEqual(newState.get('strs').toJSON(), ['world', 'world']);
       });
-      const store1 = createStore([{ str: 'hello', num: 1 }]);
+      const store1 = new Store([{ str: 'hello', num: 1 }]);
       store1.mutate((newState) => {
         newState.merge(true, [{ str: 'world' }]);
         assert.deepStrictEqual(newState.get(0).toJSON(), { str: 'world', num: 1 });
       });
     });
     it('should not deeply overwrite the values without same collection type', function () {
-      const store = createStore({ strs: ['hello', 'world'] });
+      const store = new Store({ strs: ['hello', 'world'] });
       store.mutate((newState) => {
         newState.merge(true, { strs: {} });
         assert.deepStrictEqual(newState.get('strs').toJSON(), {});
@@ -69,7 +69,7 @@ describe('immutable-state: collection.merge()', function () {
 
   describe('function strategy', function () {
     it('should overwrite using the function', function () {
-      const store = createStore({ num: 1 });
+      const store = new Store({ num: 1 });
       store.mutate((newState) => {
         newState.merge((prev, next, key) => prev + next, { num: 2 });
         assert.deepStrictEqual(newState.get('num'), 3);

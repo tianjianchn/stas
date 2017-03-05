@@ -10,8 +10,8 @@ RECOMMEND: Use [stas-immutable](https://github.com/tianjianchn/stas) with immuta
 `store.js` file:
 ```js
 const router = reuqire('./router');
-const {createStore} = require('stas');
-const store = createStore({
+const Store = require('stas');
+const store = new Store({
   tasks: [],
 });
 store.use(router)

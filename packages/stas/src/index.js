@@ -1,10 +1,5 @@
 
 const Store = require('./store');
+Store.Store = Store;
 
-function createStore(...args) {
-  return new Store(...args);
-}
-
-module.exports = {
-  Store, createStore,
-};
+module.exports = Store;

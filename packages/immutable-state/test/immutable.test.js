@@ -1,11 +1,11 @@
 
 const assert = require('assert');
-const { createStore } = require('..');// eslint-disable-line no-shadow
+const Store = require('..');// eslint-disable-line no-shadow
 
 describe('immutable-state: immutable', function () {
   describe('basic', function () {
     it('should not change state without change', function () {
-      const store = createStore();
+      const store = new Store();
       const prevState = store.getState(),
         prevJSON = prevState.toJSON();
 
@@ -21,7 +21,7 @@ describe('immutable-state: immutable', function () {
       assert.deepStrictEqual(prevJSON, {});
     });
     it('should not change old state', function () {
-      const store = createStore({ str: 'hello' });
+      const store = new Store({ str: 'hello' });
       const prevState = store.getState(),
         prevJSON = prevState.toJSON();
 
@@ -38,7 +38,7 @@ describe('immutable-state: immutable', function () {
       });
     });
     it('should not change state when error occurred', function () {
-      const store = createStore({ str: 'hello' });
+      const store = new Store({ str: 'hello' });
       const
         prevState = store.getState(),
         prevJSON = prevState.toJSON();
@@ -52,7 +52,7 @@ describe('immutable-state: immutable', function () {
       assert.strictEqual(store.getState().toJSON(), prevJSON);
     });
     it('should change state even with mutation reverted', function () {
-      const store = createStore({ str: undefined });
+      const store = new Store({ str: undefined });
       const prevState = store.getState(),
         prevJSON = prevState.toJSON();
 

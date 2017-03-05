@@ -1,11 +1,11 @@
 
 const assert = require('assert');
 // const { inspect } = require('util');
-const { createStore } = require('..');
+const Store = require('..');
 
 describe('immutable-state: usage', function () {
   it('should work with tasks example', function () {
-    const store = createStore({
+    const store = new Store({
       tasks: [],
       filter: 'all', //visibility filter, all/active
     });

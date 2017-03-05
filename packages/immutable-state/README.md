@@ -4,8 +4,8 @@ An immutable state
 ### Example
 ```js
 const router = reuqire('./router');
-const {createStore} = require('immutable-state');
-const store = createStore({
+const Store = require('immutable-state');
+const store = new Store({
   tasks: [],
 });
 
@@ -26,7 +26,7 @@ console.log(store.state);
 ```
 ### API
 
-#### createStore(initialState)
+#### new Store(initialState)
 
 #### store.mutate(callback)
 Start a new mutation operation. You should call all mutation methods in `callback` function. `callback` should use sync code, no promise or `async/await`.

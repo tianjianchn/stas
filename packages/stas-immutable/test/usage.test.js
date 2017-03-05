@@ -2,11 +2,11 @@
 const assert = require('assert');
 const Router = require('uni-router');
 // const { inspect } = require('util');
-const { createStore } = require('..');
+const Store = require('..');
 
 describe('stas-immutable: usage', function () {
   it('should work with tasks example', async function () {
-    const store = createStore({
+    const store = new Store({
       tasks: [],
     });
     const states = [store.getState()];
@@ -61,7 +61,7 @@ describe('stas-immutable: usage', function () {
   });
 
   it('should work with router', async function () {
-    const store = createStore({
+    const store = new Store({
       tasks: [],
     });
 
