@@ -1,7 +1,7 @@
 A promise-based, middleware-driven and express-like state management
 =================================
 
-RECOMMEND: Use [stas-immutable](https://github.com/tianjianchn/stas) with immutable state support!
+RECOMMEND: Use [stas-immutable](https://github.com/tianjianchn/stas) with immutable state and model support!
 
 ### Features
 * Express-like and promise-based middlewares and routers, see [Middleware](#middleware) and [Router](#router)

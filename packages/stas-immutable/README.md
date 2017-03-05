@@ -1,91 +1,147 @@
-A promise-based, middleware-driven, express-like and immutable built-in state management
+A state management with promise middleware, immutable data and model normalization
 =================================
 
 ### Features
-* Immutable state and operations, see [Immutable State](#immutable-state)
 * Express-like and promise-based middlewares and routers, see [Middleware](#middleware) and [Router](#router)
+* Immutable state and operations, see [Immutable State](#immutable-state)
+* Normalize the data by model
 
 ### Example
 `store.js` file:
 ```js
-const router = reuqire('./router');
-const Store = require('stas-immutable');
-const store = new Store({
-  tasks: [],
+import { Store, Model } from 'stas';
+import router from './router';
+
+const User = new Model('User', {
+  posts: 'Post',
 });
-store.use(router)
+const Post = new Model('Post', {
+  author: 'User',
+});
+
+const store = new Store({ users: [] }, { models: [User, Post] });
+store.use(router);
+
+module.exports = store;
 ```
 
 `router.js` file:
 ```js
-const Router = require('uni-router');
-const router = Router();
-router.all('/add-task', async (req, resp, next) => {
-  const {store} = req, {text} = req.body;
-  const result = await fetch('/server/add-task', {text})
-  const {id} = result;
+import createRouter from 'uni-router';
+
+const router = createRouter();
+
+router.all('/users/query', async (req, resp, next) => {
+  const { store } = req,
+    { offset, limit } = req.body;
+
+  const result = await fetch('/api/users/query', { offset, limit });
+
   store.mutate((newState) => {
-    newState.set('tasks', tasks => tasks.push({id, text, completed: false}));
+    const ids = store.User.merge(result);
+    newState.set('users', ids);
   });
 });
-router.all('/toggle-task', (req, resp, next) => {
-  const {store} = req, {id} = req.body;
+
+router.all('/users/:userId/posts/create', async (req, resp, next) => {
+  const { store } = req,
+    { userId } = req.params,
+    { title } = req.body;
+
+  const result = await fetch(`/api/users/${userId}/posts/create`, { title });
+
   store.mutate((newState) => {
-    newState.set('tasks', (tasks) => {
-      const index = tasks.findIndex(t => t.id === id);
-      const completed = tasks.get([index, 'completed']);
-      tasks = tasks.set([index, 'completed'], !completed);
-      return tasks;
-    });
+    const postId = store.Post.merge(result);
+    const user = store.User.get(userId).set('posts', posts => posts.push(postId));
+    store.User.set(userId, user);
   });
 });
+
+module.exports = router;
+
 ```
 
-`TodoListPage.js` file:
+`UserListPage.js` file:
 ```js
-const {PureComponent, PropTypes} = require('react');
-const {connect} = require('react-stas');
+import { PureComponent, PropTypes } from 'react';
+import { connect } from 'react-stas';
 
-class TodoListPage extends PureComponent{
+class UserListPage extends PureComponent {
   static propTypes = {
-    tasks: PropTypes.array.isRequired,
+    users: PropTypes.array.isRequired,
     dispatch: PropTypes.func.isRequired,
   }
-  onPressAddTask = ()=>{
-    return dispatch('/add-task', {text: `Remove the password: ${Math.random()}`})
+
+  static contextTypes = {
+    router: PropTypes.object,
   }
-  onPressToggleTask = (id)=>{
-    return dispatch('/toggle-task', {id})
-  }
-  render(){
-    return (
-      <button onClick={this.onPressAddTask}>Add Task</button>
-      <ul>
-        {this.props.tasks.map(task=><li>
-          <input type='checkbox' value={task.completed} onClick={()=>this.onPressToggleTask(task.id)}/>
-          <span>{task.get('text')}</span>
-        </li>)}
-      </ul>
-    )
+
+  render() {
+    const { users } = this.props;
+    const { router } = this.context;
+    return (<ul>
+      {users.map(user => <li onClick={() => router.push(`/users/${user.id}`)}>
+        <span>{user.name}</span>
+      </li>)}
+    </ul>);
   }
 }
 
-connect(({state, dispatch, props})=>{
-  return {tasks: state.get('tasks').toJSON()}
-})(TodoListPage)
+module.exports = connect(({ state, dispatch, props }) => ({ users: state.get('users').toJSON() }))(UserListPage);
+
+```
+
+
+`UserPostsPage.js` file:
+```js
+import { PureComponent, PropTypes } from 'react';
+import { connect } from 'react-stas';
+
+class UserPostsPage extends PureComponent {
+  static propTypes = {
+    user: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  }
+
+  onPressAddTask = () => {
+    const { user, dispatch } = this.props;
+    dispatch(`/users/${user.id}/posts/create`, { title: `New Post ${Date.now()}` });
+  }
+
+  render() {
+    const { user } = this.props;
+    const { posts } = user;
+    return (<ul>
+      <button onClick={this.onPressAddPost}>Add Post</button>
+      {posts.map(post => <li>
+        <span>{post.title}</span>
+      </li>)}
+    </ul>);
+  }
+}
+
+module.exports = connect(({ state, dispatch, props, store }) => {
+  const user = store.User.get(props.userId).toJSON();
+  user.posts = user.posts.map(postId => store.Post.get(postId).toJSON());
+  return { user };
+})(UserPostsPage);
+
 ```
 
 `index.js` file:
 ```js
-const ReactDom = require('react-dom');
-const {Provider} = require('react-stas')
-const store = require('./store');
-const TodoListPage = require('./TodoListPage');
+import ReactDom from 'react-dom';
+import { Provider } from 'react-stas';
+import store from './store';
+import UserListPage from './UserListPage';
 
 ReactDom.render(
-  <Provider store={store}><TodoListPage /></Provider>,
-  document.getElementById('app')
+  <Provider store={store}>
+    <UserListPage />
+  </Provider>,
+  document.getElementById('app'),
 );
+
 ```
 
 ### Immutable State

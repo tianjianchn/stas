@@ -1,6 +1,6 @@
 {
   "name": "stas-immutable",
-  "description": "A promise-based, middleware-driven, express-like and immutable built-in state management",
+  "description": "A state management with promise middleware, immutable data and model normalization",
   "version": "0.1.11",
   "scripts": {},
   "main": "dist/index.js",
