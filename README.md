@@ -96,7 +96,7 @@ ReactDom.render(
 ```
 
 ### Immutable State
-State is immutable by using [immutable-state](/packages/immutable-state). Most operations are like [immutable-js](https://github.com/facebook/immutable-js/). 
+State is immutable by using [immutable-state](/packages/immutable-state)(most operations are like [immutable-js](https://github.com/facebook/immutable-js/)). 
 Mutation methods(like `.set()`, `.remove()`) must be used in `store.mutate()`, while others(like `.get()`, `.filter()`) are not.
 
 #### store.mutate(callback)

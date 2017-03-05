@@ -36,7 +36,7 @@ function connect(selector = defaultSelector) {
         const dispatch = store.dispatch;
         const selectorParams = { state, dispatch, props: this.props, store };
         const props = selector(selectorParams) || defaultSelector(selectorParams);
-        return {...this.props, dispatch, ...props};
+        return { ...this.props, dispatch, ...props };
       }
 
       render() {
