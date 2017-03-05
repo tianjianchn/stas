@@ -220,6 +220,27 @@ Like `array.unshift`. `List` only.
 #### .shift()
 Like `array.shift`. `List` only.
 
+### Hot Reload(HMR)
+Since react-native doesn't support module.hot.accept(path, callback) but module.hot.accept(callback), we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
+```js
+import Store from 'stas-immutable';
+import routers from './routers';
+
+export default function createStore() {
+  const store = new Store()
+  store.use(routers);
+
+  if (module.hot) {
+    module.hot.accept(() => {
+      const newRouters = require('./routers').default;
+      store.clearMiddlewares();
+      store.use(newRouters);
+    });
+  }
+  return store;
+}
+```
+
 ### Contributing
 Checkout the [CONTRIBUTING.md](/CONTRIBUTING.md) if you want to help
 
