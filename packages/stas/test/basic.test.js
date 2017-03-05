@@ -59,23 +59,36 @@ describe('stas-immutable: basic', function () {
     });
     const router = createRouter();
     router.all('/a', (req, resp, next) => {
-      if (req.url === '/a') {
-        setTimeout(() => {
-          store.mutate((newState) => {
-            newState.set('str', 'world');
-          });
-        }, 10);
-      }
+      setTimeout(() => {
+        store.mutate((newState) => {
+          newState.set('str', 'world');
+        });
+      }, 10);
     });
     store.use(router);
     store.dispatch('/a');
   });
-  it('should work with model', function () {
+  it('should work with model', function (done) {
     const User = new Model('User');
     const store = new Store(null, { models: [User] });
-    store.mutate((newState) => {
-      store.User.merge({ id: 1, name: 'Tian' });
+    store.subscribe((newState, oldState) => {
+      assert.deepStrictEqual(newState.toJSON(), {
+        __models__: { User: { 1: { id: 1, name: 'Tian' } } },
+        users: [1],
+      });
+      done();
     });
-    assert.deepStrictEqual(store.state.toJSON(), { __models__: { User: { 1: { id: 1, name: 'Tian' } } } });
+    const router = createRouter();
+    router.all('/a', (req, resp, next) => {
+      const { store } = req; // eslint-disable-line no-shadow
+      setTimeout(() => {
+        store.mutate((newState) => {
+          const ids = store.User.merge([{ id: 1, name: 'Tian' }]);
+          newState.set('users', ids);
+        });
+      }, 10);
+    });
+    store.use(router);
+    store.dispatch('/a');
   });
 });
