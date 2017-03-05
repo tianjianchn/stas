@@ -7,6 +7,12 @@ class StasImmutableStore extends BasicStore {
     super(initialState);
     this._storage = new ImmStore(initialState, { models });
     this._state = this._storage.getState();
+
+    if (models) {
+      models.forEach((model) => {
+        this[model.name] = model;
+      });
+    }
   }
 
   mutate(callback) {

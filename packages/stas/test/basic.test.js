@@ -1,7 +1,7 @@
 
 const assert = require('assert');
 const createRouter = require('uni-router');
-const Store = require('..');
+const { Store, Model } = require('..');
 
 describe('stas-immutable: basic', function () {
   it('should work with initial state', function () {
@@ -69,5 +69,13 @@ describe('stas-immutable: basic', function () {
     });
     store.use(router);
     store.dispatch('/a');
+  });
+  it('should work with model', function () {
+    const User = new Model('User');
+    const store = new Store(null, { models: [User] });
+    store.mutate((newState) => {
+      store.User.merge({ id: 1, name: 'Tian' });
+    });
+    assert.deepStrictEqual(store.state.toJSON(), { __models__: { User: { 1: { id: 1, name: 'Tian' } } } });
   });
 });
