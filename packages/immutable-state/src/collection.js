@@ -17,14 +17,13 @@ Collection.prototype._data = null; // the keys' value
 Collection.prototype._json = null; // the last exported plain json data
 
 // under which mutation operation(store.mutate()).
-// if this value equals to store's mutationId, that means record was cloned
+// if this value equals to global mutation id, that means instance is cloned
 // and ready for changed.
 Collection.prototype._mutationId = null;
 
 // whether current data is marked changed.
-// if record is cloned and this value is true, that means record is changed.
+// if instance is cloned and this value is true, that means instance is changed.
 Collection.prototype._changed = false;
-
 
 Collection.prototype._clone = function _clone() {
   const { store, id } = operation;
@@ -299,7 +298,7 @@ Collection.prototype.merge = function merge(...args) {
       const next = value._data[kk],
         prev = cloned._data[kk];
       if (next instanceof Collection && prev instanceof Collection && next._type === prev._type) {
-        cloned._data[kk] = prev.merge(next);
+        cloned._data[kk] = prev.merge(true, next);
       } else {
         cloned._data[kk] = next;
       }
