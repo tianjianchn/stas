@@ -3,15 +3,13 @@ const BasicStore = require('stas-core');
 const ImmStore = require('immutable-state');
 
 class StasImmutableStore extends BasicStore {
-  constructor(initialState, { models = [] } = {}) {
+  constructor(initialState, { models } = {}) {
     super(initialState);
     this._storage = new ImmStore(initialState, { models });
     this._state = this._storage.getState();
 
-    if (models) {
-      models.forEach((model) => {
-        this[model.name] = model;
-      });
+    if (this._storage.models) {
+      this.models = this._storage.models;
     }
   }
 

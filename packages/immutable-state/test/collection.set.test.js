@@ -6,6 +6,7 @@ describe('immutable-state: collection.set()', function () {
   describe('invalid key', function () {
     it('should throw with empty key', function () {
       assert.throws(() => new Map().set(), /Need keys path in set\(\)/);
+      assert.throws(() => new Map().set(), /Need keys path in set\(\)/);
       assert.throws(() => new Map().set(null), /Need keys path in set\(\)/);
       assert.throws(() => new Map().set(undefined), /Need keys path in set\(\)/);
       assert.throws(() => new Map().set(false), /Need keys path in set\(\)/);
@@ -23,6 +24,7 @@ describe('immutable-state: collection.set()', function () {
       assert.throws(() => new Map().set([[]]), /Only support number or string key in set\(\)/);
       assert.throws(() => new Map().set([{}]), /Only support number or string key in set\(\)/);
       assert.throws(() => new List().set('a'), /Invalid key in set\(\) on list, should be number or number string/);
+      assert.throws(() => new Map().set(['1', '2']), /Cannot call set method on non-collection value of key 1/);
     });
     it('should throw with invalid sub key', function () {
       const store = new Store({ str: {} });

@@ -1,48 +1,54 @@
 
 const assert = require('assert');
-const { Model, Store } = require('..');
+const { Store } = require('..');
 
 describe('immutable-state: model', function () {
   describe('constructor', function () {
     it('should work with string fields', function () {
-      const User = new Model('User', {
-        posts: 'Post',
-      });
-      const Post = new Model('Post', {
-        user: 'User',
-      });
-      const store = new Store(null, { models: [User, Post] });
+      const store = new Store(null, { models: [
+        ['User', {
+          posts: 'Post',
+        }],
+        ['Post', {
+          user: 'User',
+        }],
+      ] });
       assert.deepStrictEqual(store.state.toJSON(), { __models__: { Post: {}, User: {} } });
     });
     it('should work with model fields', function () {
-      const User = new Model('User', {
-        posts: 'Post',
-      });
-      const Post = new Model('Post', {
-        user: User,
-      });
-      const store = new Store(null, { models: [User, Post] });
+      const store = new Store(null, { models: [
+        ['User', {
+          posts: 'Post',
+        }],
+        ['Post', {
+          user: 'User',
+        }],
+      ] });
       assert.deepStrictEqual(store.state.toJSON(), { __models__: { Post: {}, User: {} } });
     });
     it('should throw with nonexistent model in fields', function () {
-      const User = new Model('User', {
-        posts: 'NonexistentModel',
-      });
-      assert.throws(() => new Store(null, { models: [User] }),
-        /Not found model NonexistentModel for field posts of model User/);
+      const models = [
+        ['User', {
+          posts: 'NonexistentModel',
+        }],
+      ];
+      assert.throws(() => new Store(null, { models }),
+        /Not found model NonexistentModel for field posts in model User/);
     });
     it('should throw without model in fields', function () {
-      const User = new Model('User', {
-        posts: 1,
-      });
-      assert.throws(() => new Store(null, { models: [User] }), /Need model for field posts of model User/);
+      const models = [
+        ['User', {
+          posts: 1,
+        }],
+      ];
+      assert.throws(() => new Store(null, { models }), /Need model for field posts in model User/);
     });
   });
 
   describe('.merge()', function () {
     it('should work with one level model and single record', function () {
-      const User = new Model('User');
-      const store = new Store(null, { models: [User] });
+      const store = new Store(null, { models: ['User'] });
+      const { User } = store.models;
       store.mutate((newState) => {
         const id = User.merge({ id: 1, name: 'Tian' });
         assert.equal(id, 1);
@@ -50,8 +56,8 @@ describe('immutable-state: model', function () {
       assert.deepStrictEqual(store.state.toJSON(), { __models__: { User: { 1: { id: 1, name: 'Tian' } } } });
     });
     it('should work with one level model and multi records', function () {
-      const User = new Model('User');
-      const store = new Store(null, { models: [User] });
+      const store = new Store(null, { models: ['User'] });
+      const { User } = store.models;
       store.mutate((newState) => {
         const ids = User.merge([{ id: 1, name: 'Tian' }, { id: 2, name: 'Jian' }]);
         assert.deepStrictEqual(ids, [1, 2]);
@@ -60,8 +66,8 @@ describe('immutable-state: model', function () {
         User: { 1: { id: 1, name: 'Tian' }, 2: { id: 2, name: 'Jian' } } } });
     });
     it('should work with null', function () {
-      const User = new Model('User');
-      const store = new Store(null, { models: [User] });
+      const store = new Store(null, { models: ['User'] });
+      const { User } = store.models;
       store.mutate((newState) => {
         const result = User.merge(null);
         assert.deepStrictEqual(result, null);
@@ -69,11 +75,9 @@ describe('immutable-state: model', function () {
       assert.deepStrictEqual(store.state.toJSON(), { __models__: { User: { } } });
     });
     it('should work with nested models and single record', function () {
-      const User = new Model('User');
-      const Post = new Model('Post', {
-        user: User,
-      });
-      const store = new Store(null, { models: [User, Post] });
+      const models = ['User', ['Post', { user: 'User' }]];
+      const store = new Store(null, { models });
+      const { Post } = store.models;
       store.mutate((newState) => {
         const id = Post.merge({ id: 1, title: 'Hello', user: { id: 2, name: 'Tian' } });
         assert.equal(id, 1);
@@ -83,11 +87,9 @@ describe('immutable-state: model', function () {
         Post: { 1: { id: 1, title: 'Hello', user: 2 } } } });
     });
     it('should work with nested models and multi records', function () {
-      const Post = new Model('Post');
-      const User = new Model('User', {
-        posts: Post,
-      });
-      const store = new Store(null, { models: [User, Post] });
+      const models = ['Post', ['User', { posts: 'Post' }]];
+      const store = new Store(null, { models });
+      const { User } = store.models;
       store.mutate((newState) => {
         const id = User.merge({ id: 1, name: 'Tian',
           posts: [{ id: 2, title: 'Hello' }, { id: 3, title: 'World' }] });
@@ -98,13 +100,9 @@ describe('immutable-state: model', function () {
         Post: { 2: { id: 2, title: 'Hello' }, 3: { id: 3, title: 'World' } } } });
     });
     it('should work with circular nested models', function () {
-      const User = new Model('User', {
-        posts: 'Post',
-      });
-      const Post = new Model('Post', {
-        user: 'User',
-      });
-      const store = new Store(null, { models: [User, Post] });
+      const models = [['Post', { user: 'User' }], ['User', { posts: 'Post' }]];
+      const store = new Store(null, { models });
+      const { User } = store.models;
       store.mutate((newState) => {
         const id = User.merge({ id: 1, name: 'Tian',
           posts: [
@@ -118,10 +116,10 @@ describe('immutable-state: model', function () {
       } });
     });
     it('should merge with existent record', function () {
-      const User = new Model('User');
       const store = new Store({ __models__: {
         User: { 1: { id: 1, name: 'Tian', addr: 'Beijing' } } },
-      }, { models: [User] });
+      }, { models: ['User'] });
+      const { User } = store.models;
       store.mutate((newState) => {
         User.merge({ id: 1, name: 'Jian' });
       });
@@ -132,20 +130,20 @@ describe('immutable-state: model', function () {
 
   describe('.get()/.mget()', function () {
     it('should get the record outside or inside store.mutate()', function () {
-      const User = new Model('User');
       const store = new Store({ __models__: {
         User: { 1: { id: 1, name: 'Tian' } } },
-      }, { models: [User] });
+      }, { models: ['User'] });
+      const { User } = store.models;
       assert.deepStrictEqual(User.get(1).toJSON(), { id: 1, name: 'Tian' });
       store.mutate((newState) => {
         assert.deepStrictEqual(User.get(1).toJSON(), { id: 1, name: 'Tian' });
       });
     });
     it('should get multiple records', function () {
-      const User = new Model('User');
       const store = new Store({ __models__: {
         User: { 1: { id: 1, name: 'Tian' }, 2: { id: 2, name: 'Jian' } } },
-      }, { models: [User] });
+      }, { models: ['User'] });
+      const { User } = store.models;
       assert.deepStrictEqual(User.mget(1).map(val => val.toJSON()), [{ id: 1, name: 'Tian' }]);
       assert.deepStrictEqual(User.mget([1]).map(val => val.toJSON()), [{ id: 1, name: 'Tian' }]);
       assert.deepStrictEqual(User.mget(1, 2).map(val => val.toJSON()),
@@ -162,10 +160,10 @@ describe('immutable-state: model', function () {
 
   describe('.set()', function () {
     it('should set the id with new record', function () {
-      const User = new Model('User');
       const store = new Store({ __models__: {
         User: { 1: { id: 1, name: 'Tian' } } },
-      }, { models: [User] });
+      }, { models: ['User'] });
+      const { User } = store.models;
       store.mutate((newState) => {
         User.set(1, { id: 1, name: 'Jian' });
       });
@@ -176,10 +174,10 @@ describe('immutable-state: model', function () {
 
   describe('.remove()', function () {
     it('should remove record', function () {
-      const User = new Model('User');
       const store = new Store({ __models__: {
         User: { 1: { id: 1, name: 'Tian' } } },
-      }, { models: [User] });
+      }, { models: ['User'] });
+      const { User } = store.models;
       store.mutate((newState) => {
         User.remove(1);
       });

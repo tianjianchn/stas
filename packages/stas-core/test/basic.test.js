@@ -2,7 +2,7 @@
 const assert = require('assert');
 const Store = require('..');
 
-describe('stas: basic', function () {
+describe('stas-core: basic', function () {
   it('should work with empty initial state', function () {
     const store = new Store();
     assert.deepStrictEqual(store.state, undefined);

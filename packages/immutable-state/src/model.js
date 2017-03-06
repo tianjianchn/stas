@@ -3,21 +3,22 @@ const isPlainObject = require('lodash.isplainobject');
 
 const operation = global._IMS_MUTATE_OPERATION_;
 
-function Model(name, fields) {
+function Model(name, fields, { store } = {}) {
   if (!name) {
     throw new Error('Need name to create a model');
   }
+  if (!store) {
+    throw new Error('Need store to create a model');
+  }
 
   this._name = name;
-
+  this._store = store;
   this._fields = fields || {};// {<field name>: <model>}
 }
 
-Object.defineProperties(Model.prototype, {
-  name: {
-    get() {
-      return this._name;
-    },
+Object.defineProperty(Model.prototype, 'name', {
+  get() {
+    return this._name;
   },
 });
 
@@ -28,28 +29,20 @@ function getModel(key, val) {
   }
 
   if (!model) {
-    throw new Error(`Not found model ${val} for field ${key} of model ${this._name}`);
+    throw new Error(`Not found model ${val} for field ${key} in model ${this._name}`);
   } else if (!(model instanceof Model)) {
-    throw new Error(`Need model for field ${key} of model ${this._name}`);
+    throw new Error(`Need model for field ${key} in model ${this._name}`);
   } else {
     return model;
   }
 }
 
-function validate() {
+Model.prototype.ensure = function ensure() {
   if (!this._fields) return;
   Object.keys(this._fields).forEach((key) => {
     const val = this._fields[key];
     this._fields[key] = getModel.call(this, key, val);
   });
-}
-
-Model.prototype.bindStore = function bindStore(store) {
-  if (this._store) {
-    throw new Error(`Model ${this._name} should be attached to only one store`);
-  }
-  this._store = store;
-  validate.call(this);
 };
 
 function getState(isMutatation) {

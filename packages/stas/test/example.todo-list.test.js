@@ -4,7 +4,7 @@ const createRouter = require('uni-router');
 // const { inspect } = require('util');
 const Store = require('..');
 
-describe('stas-immutable: todo list example', function () {
+describe('stas: todo list example', function () {
   it('should work', async function () {
     const store = new Store({
       tasks: [],

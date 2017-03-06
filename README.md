@@ -7,62 +7,60 @@ A state management with promise middleware, immutable data and model normalizati
 * Normalize the data by model
 
 ### Example
-`store.js` file:
 ```js
+// store.js
 import { Store, Model } from 'stas';
 import router from './router';
 
-const User = new Model('User', {
-  posts: 'Post',
-});
-const Post = new Model('Post', {
-  author: 'User',
-});
+const models = [
+  ['User', {
+    posts: 'Post',
+  }],
+  ['Post', {
+    author: 'User',
+  }],
+];
 
-const store = new Store({ users: [] }, { models: [User, Post] });
+const store = new Store({ users: [] }, { models });
 store.use(router);
 
 module.exports = store;
-```
 
-`router.js` file:
-```js
+// router.js
 import createRouter from 'uni-router';
-
 const router = createRouter();
 
 router.all('/users/query', async (req, resp, next) => {
   const { store } = req,
+    { User } = store.models,
     { offset, limit } = req.body;
 
   const result = await fetch('/api/users/query', { offset, limit });
 
   store.mutate((newState) => {
-    const ids = store.User.merge(result);
+    const ids = User.merge(result);
     newState.set('users', ids);
   });
 });
 
 router.all('/users/:userId/posts/create', async (req, resp, next) => {
   const { store } = req,
+    { User, Post } = store.models,
     { userId } = req.params,
     { title } = req.body;
 
   const result = await fetch(`/api/users/${userId}/posts/create`, { title });
 
   store.mutate((newState) => {
-    const postId = store.Post.merge(result);
-    const user = store.User.get(userId).set('posts', posts => posts.push(postId));
+    const postId = Post.merge(result);
+    const user = User.get(userId).set('posts', posts => posts.push(postId));
     store.User.set(userId, user);
   });
 });
 
 module.exports = router;
 
-```
-
-`UserListPage.js` file:
-```js
+// UserListPage.js
 import { PureComponent, PropTypes } from 'react';
 import { connect } from 'react-stas';
 
@@ -72,64 +70,29 @@ class UserListPage extends PureComponent {
     dispatch: PropTypes.func.isRequired,
   }
 
-  static contextTypes = {
-    router: PropTypes.object,
-  }
-
   render() {
     const { users } = this.props;
-    const { router } = this.context;
     return (<ul>
-      {users.map(user => <li onClick={() => router.push(`/users/${user.id}`)}>
+      {users.map(user => <li>
         <span>{user.name}</span>
-      </li>)}
-    </ul>);
-  }
-}
-
-module.exports = connect(({ state, dispatch, props }) => ({ users: state.get('users').toJSON() }))(UserListPage);
-
-```
-
-
-`UserPostsPage.js` file:
-```js
-import { PureComponent, PropTypes } from 'react';
-import { connect } from 'react-stas';
-
-class UserPostsPage extends PureComponent {
-  static propTypes = {
-    user: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired,
-  }
-
-  onPressAddTask = () => {
-    const { user, dispatch } = this.props;
-    dispatch(`/users/${user.id}/posts/create`, { title: `New Post ${Date.now()}` });
-  }
-
-  render() {
-    const { user } = this.props;
-    const { posts } = user;
-    return (<ul>
-      <button onClick={this.onPressAddPost}>Add Post</button>
-      {posts.map(post => <li>
-        <span>{post.title}</span>
+        <span>{user.posts.map(post => post.title).join(',')}</span>
       </li>)}
     </ul>);
   }
 }
 
 module.exports = connect(({ state, dispatch, props, store }) => {
-  const user = store.User.get(props.userId).toJSON();
-  user.posts = user.posts.map(postId => store.Post.get(postId).toJSON());
-  return { user };
-})(UserPostsPage);
+  const { User, Post } = store.models;
+  const userIds = state.get('users').toJSON();
+  const users = User.mget(userIds).map((user) => {
+    user = user.toJSON();
+    user.posts = user.posts.map(postId => Post.get(postId).toJSON());
+    return user;
+  });
+  return { users };
+})(UserListPage);
 
-```
-
-`index.js` file:
-```js
+// index.js
 import ReactDom from 'react-dom';
 import { Provider } from 'react-stas';
 import store from './store';
@@ -187,23 +150,8 @@ Return the keys
 #### .length or .size
 Return the keys length
 
-#### .filter((value, key, this)=>bool)
-Like `array.filter`
-
-#### .find((value, key, this)=>bool)
-Like `array.find`
-
-#### .findKey((value, key, this)=>bool)
-Like `array.findIndex`
-
-#### .forEach((value, key, this)=>void)
-Like `array.forEach`
-
-#### .map((value, key, this)=>any)
-Like `array.map`
-
-#### .reduce((value, key, this)=>any, initialData)
-Like `array.reduce`
+#### .filter()/.find()/.findKey()/.forEach()/.map()/.reduce()/
+Like array corresponding methods, most with `(value, key, thisArg)=>{}` signature.
 
 #### .remove(keyPath) or .delete(keyPath)
 Remove the leaf key
@@ -211,23 +159,8 @@ Remove the leaf key
 #### .merge(strategy?: bool|function, input)
 Merge the value with specific strategy. 
 
-#### .slice(start, end)
-Like `array.slice`. `List` only.
-
-#### .findIndex((value, index, this)=>bool)
-Like `array.findIndex`. `List` only.
-
-#### .push(value)
-Like `array.push`. `List` only.
-
-#### .pop()
-Like `array.pop`. `List` only.
-
-#### .unshift(value)
-Like `array.unshift`. `List` only.
-
-#### .shift()
-Like `array.shift`. `List` only.
+#### .slice()/.findIndex()/.push()/.pop()/.unshift()/.shift()
+Like array corresponding methods. `List` only.
 
 ### Hot Reload(HMR)
 Since react-native doesn't support module.hot.accept(path, callback) but module.hot.accept(callback), we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.

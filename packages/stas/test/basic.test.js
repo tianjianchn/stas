@@ -1,9 +1,9 @@
 
 const assert = require('assert');
 const createRouter = require('uni-router');
-const { Store, Model } = require('..');
+const { Store } = require('..');
 
-describe('stas-immutable: basic', function () {
+describe('stas: basic', function () {
   it('should work with initial state', function () {
     const store = new Store({ str: 'hello' });
     assert.deepStrictEqual(store.state.get('str'), 'hello');
@@ -69,8 +69,7 @@ describe('stas-immutable: basic', function () {
     store.dispatch('/a');
   });
   it('should work with model', function (done) {
-    const User = new Model('User');
-    const store = new Store(null, { models: [User] });
+    const store = new Store(null, { models: ['User'] });
     store.subscribe((newState, oldState) => {
       assert.deepStrictEqual(newState.toJSON(), {
         __models__: { User: { 1: { id: 1, name: 'Tian' } } },
@@ -80,10 +79,11 @@ describe('stas-immutable: basic', function () {
     });
     const router = createRouter();
     router.all('/a', (req, resp, next) => {
-      const { store } = req; // eslint-disable-line no-shadow
+      const { store } = req, // eslint-disable-line no-shadow
+        { User } = store.models;
       setTimeout(() => {
         store.mutate((newState) => {
-          const ids = store.User.merge([{ id: 1, name: 'Tian' }]);
+          const ids = User.merge([{ id: 1, name: 'Tian' }]);
           newState.set('users', ids);
         });
       }, 10);

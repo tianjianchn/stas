@@ -28,14 +28,17 @@ console.log(store.state.toJSON());
 
 ### Store
 
-#### new Store(initialData, { models = [] })
-Create a new store with initial json data. Data can be either an array([]) or a plain json object({}). You can also pass in the models, use the models to normalize your state data, see [Model](#model).
+#### new Store(initialData, { models })
+Create a new store with initial json data. Data can be either an array([]) or a plain json object({}). You can also pass in the model definitions, then use the models to normalize your state data, see [Model](#model).
 
 #### store.mutate(callback)
 Start a new mutation operation. `callback` should use sync code, no promise or `async/await`. You should call all mutation methods in `callback` function, like `.set()`, `.merge()`. Other methods like `.get()` are not forced to be used in `callback` function. After callback end(return), if the state changed then set the new state.
 
 #### store.state or store.getState()
 Get current state of the store. State will be either a map or a list.
+
+#### store.models
+Return the model instances map.
 
 ### Map
 It is json object replacement in `immutable-state`. All plain json object({}) inserted to the store will be converted to a map. 
@@ -128,20 +131,24 @@ const post = {
 };
 
 ```
-If we want to change the user's name, many locations need to change, which is terrible! So we use Model to flatten the structure, use id to keep the relationships. 
+If we want to change the user's name, many locations need to check and change, which is terrible! So we use models to flatten the structure, and use id to keep the records' relationships. 
 ```js
-import { Store, Model } from 'immutable-state';
+import { Store } from 'immutable-state';
 
-const User = new Model('User');
-const Post = new Model('Post', {
-  author: 'User',
-  comments: 'Comment',
-});
-const Comment = new Model('Comment', {
-  creater: 'User',
-});
+const models = [
+  'User',
+  ['Post', {
+    author: 'User',
+    comments: 'Comment',
+  }],
+  ['Comment', {
+    creater: 'User',
+  }],
+];
 
-const store = new Store({ post: null }, { models: [User, Post, Comment] });
+const store = new Store({ post: null }, { models });
+const { Post } = store.models;
+
 store.mutate((newState) => {
   const id = Post.merge(post);
   newState.set('post', id);

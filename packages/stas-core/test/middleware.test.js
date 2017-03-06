@@ -2,7 +2,7 @@
 const assert = require('assert');
 const Store = require('..');
 
-describe('stas: middleware', function () {
+describe('stas-core: middleware', function () {
   it('should work with zero middleware', function () {
     const state = { count: 0 };
     const store = new Store(state);

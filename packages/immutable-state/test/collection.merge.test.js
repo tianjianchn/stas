@@ -46,7 +46,7 @@ describe('immutable-state: collection.merge()', function () {
   });
 
   describe('deep strategy', function () {
-    it.only('should deeply overwrite the values with same collection type', function () {
+    it('should deeply overwrite the values with same collection type', function () {
       const store = new Store({ strs: ['hello', 'world'] });
       store.mutate((newState) => {
         newState.merge(true, { strs: ['world'] });

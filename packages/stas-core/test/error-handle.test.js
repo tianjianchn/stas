@@ -2,7 +2,7 @@
 const assert = require('assert');
 const Store = require('..');
 
-describe('stas: error handle', function () {
+describe('stas-core: error handle', function () {
   it('should catch the downstream error', function () {
     const store = new Store();
 
