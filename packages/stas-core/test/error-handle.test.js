@@ -1,6 +1,6 @@
 
-const assert = require('assert');
-const Store = require('..');
+import assert from 'assert';
+import Store from '..';
 
 describe('stas-core: error handle', function () {
   it('should catch the downstream error', function () {

@@ -11,7 +11,8 @@
     "node": ">= 4"
   },
   "dependencies": {
-    "uni-compose": "^0.1.0"
+    "uni-compose": "^0.1.0",
+    "uni-router": "^0.1.4"
   },
   "devDependencies": {},
   "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-core",

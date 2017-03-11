@@ -1,5 +1,8 @@
 
-const Store = require('./store');
-Store.Store = Store;
+import createRouter from 'uni-router';
+import Store from './store';
 
-module.exports = Store;
+export default Store;
+export {
+  createRouter, Store,
+};

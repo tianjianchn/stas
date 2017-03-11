@@ -1,7 +1,7 @@
 
 const compose = require('uni-compose');
 
-class StasStore {
+export default class StasBasicStore {
   _state = null;
   _subscribers = [];// listeners subscribed on state changed
   _middlewares = [];
@@ -16,7 +16,9 @@ class StasStore {
     return this._state;
   }
 
-  getState = () => this._state
+  getState() {
+    return this._state;
+  }
 
   use(...middlewares) {
     this._stack = null;
@@ -59,5 +61,3 @@ class StasStore {
     this._subscribers.forEach(listener => listener(newState, oldState));
   }
 }
-
-module.exports = StasStore;
