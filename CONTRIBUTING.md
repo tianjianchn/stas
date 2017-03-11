@@ -13,7 +13,7 @@ npm run bootstrap
 ```bash
 npm run build # Build once
 npm run watch # Build all, then watch each package `src` files and build if changed
-npm run test:only # No build task involved
+npm run test:only -s # No build task involved, and make npm not display its fail stack
 npm test # Run lint, clean, build and test:only tasks
 ```
 
