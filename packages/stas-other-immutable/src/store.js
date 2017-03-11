@@ -1,6 +1,6 @@
 
-const BasicStore = require('stas-core');
-const ImmStore = require('immutable-state');
+import BasicStore from 'stas-core';
+import ImmStore from 'immutable-state';
 
 class StasImmutableStore extends BasicStore {
   constructor(initialState, { models } = {}) {
