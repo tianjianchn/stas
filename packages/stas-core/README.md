@@ -5,9 +5,8 @@ RECOMMEND: Use [stas](https://github.com/tianjianchn/stas) with immutable state 
 
 ### Example
 ```js
-
 // store.js
-import Store from 'stas';
+import Store from 'stas-core';
 import router from './router';
 const store = new Store({
   tasks: [],
@@ -15,7 +14,7 @@ const store = new Store({
 store.use(router);
 
 // router.js
-import createRouter from 'uni-router';
+import { createRouter } from 'stas-core';
 const router = createRouter();
 
 router.all('/tasks/add', async (req, resp, next) => {
@@ -76,7 +75,6 @@ ReactDom.render(
   <Provider store={store}><TodoListPage /></Provider>,
   document.getElementById('app'),
 );
-
 ```
 
 ### Installation

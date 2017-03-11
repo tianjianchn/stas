@@ -63,6 +63,15 @@ describe('stas-core: basic', function () {
     });
     store.setState({ a: 1 });
   });
+  it('should trigger subscribers with forceUpdate()', function (done) {
+    const store = new Store({ a: '' });
+    store.subscribe((newState, oldState) => {
+      assert.strictEqual(newState, oldState);
+      assert.deepStrictEqual(oldState, { a: '' });
+      done();
+    });
+    store.forceUpdate();
+  });
   describe('.dispatch()', function () {
     it('should bound this with store', function () {
       const store = new Store();

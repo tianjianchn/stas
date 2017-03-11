@@ -53,6 +53,10 @@ export default class StasBasicStore {
     return this._stack(req, resp);
   }
 
+  forceUpdate() {
+    this._subscribers.forEach(listener => listener(this._state, this._state));
+  }
+
   setState(newState) {
     if (newState === this._state) return;
     const oldState = this._state;
