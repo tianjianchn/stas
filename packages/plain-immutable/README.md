@@ -76,6 +76,13 @@ Return a new immutable copy having merged with the value by the strategy. Strate
 * false(or not specified): Old value will be overwriten
 * true: Deeply merge if the two values are with same type(array or object)
 * function: Called a merger with `(prev, next, key)=>any`. It will be invoked on each conflicted key.
+```js
+const arr = immutable([1, { a: 2, b: 3 }]);
+console.log(arr.merge([-1, { c: 4 }])); // [-1, {c: 4}]
+console.log(arr.merge(true, [-1, { c: 4 }])); // [-1, {a: 2, b: 3, c: 4}]
+
+console.log(immutable([1, 2]).merge((p, n) => p + n, [2, 3])); // [3, 5]
+```
 
 #### .mutable()
 *Alias .asMutable()*  
@@ -93,6 +100,10 @@ Since array has a lot of methods like `push` and `slice`. Some are mutation oper
 For non-mutation methods that doesn't surely return literal value like `slice`, they are replaced to return immutable value. These methods are `slice`, `concat`, `map`, `reduce`, `reduceRight`, `filter`.  
 For mutation methods like `push`, they are replaced to return a new immutable copy other than their orignal returns. These methods are `push`, `pop`, `shift`, `unshift`, `fill`, `sort`, `splice`, `reverse`, `copyWithin`.  
 If any of these methods doesn't exist, no replacement for that method exists too.
+```js
+const arr = immutable([1, 2, 3]);
+const newArr = arr.push(4); // [1, 2, 3, 4]
+```
 
 ### License
 Licensed under MIT
