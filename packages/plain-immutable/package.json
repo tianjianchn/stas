@@ -24,6 +24,8 @@
   "keywords": [
     "readonly",
     "immutable",
-    "json"
+    "json",
+    "array",
+    "plain object"
   ]
 }
