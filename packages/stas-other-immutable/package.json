@@ -1,0 +1,38 @@
+{
+  "name": "stas-other-immutable",
+  "description": "A state management with promise middleware, immutable data and model normalization",
+  "version": "0.3.0",
+  "scripts": {},
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 4"
+  },
+  "dependencies": {
+    "immutable-state": "^0.3.0",
+    "stas-core": "^0.3.0"
+  },
+  "devDependencies": {},
+  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-other-immutable",
+  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/stas-other-immutable",
+  "bugs": "https://github.com/tianjianchn/stas/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Tian Jian",
+    "email": "tianjianchn@qq.com"
+  },
+  "keywords": [
+    "stas",
+    "flux",
+    "state",
+    "immutable",
+    "express",
+    "middleware",
+    "use",
+    "promise",
+    "async",
+    "await"
+  ]
+}
