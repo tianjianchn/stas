@@ -2,9 +2,9 @@ A state management with promise middleware, immutable data and model normalizati
 =================================
 
 ### Features
-* Express-like and promise-based middlewares and routers, see [Middleware](#middleware) and [Router](#router)
-* Immutable state and operations, see [Immutable State](#immutable-state)
-* Normalize the data by model
+* Express-like and promise-based middlewares and routers. See [Middleware](#middleware) and [Router](#router)
+* Immutable state and operations. See [Immutable State](#immutable-state)
+* Model support to normalize data and operate like database. See [Model](#model)
 
 ### Example
 ```js
@@ -12,49 +12,45 @@ A state management with promise middleware, immutable data and model normalizati
 import { Store, Model } from 'stas';
 import router from './router';
 
-const models = [
-  ['User', {
-    posts: 'Post',
-  }],
-  ['Post', {
-    author: 'User',
-  }],
-];
+const store = new Store({ users: [] });
 
-const store = new Store({ users: [] }, { models });
+store.model('User', { posts: ['Post'] });
+store.model('Post', { author: 'User' });
+
 store.use(router);
 
 module.exports = store;
 
 // router.js
-import createRouter from 'uni-router';
+import { createRouter } from 'stas';
 const router = createRouter();
 
-router.all('/users/query', async (req, resp, next) => {
-  const { store } = req,
-    { User } = store.models,
-    { offset, limit } = req.body;
+router.all('/users/query', async (req, store, next) => {
+  const User = store.model('User');
+  const { offset, limit } = req.body;
 
   const result = await fetch('/api/users/query', { offset, limit });
 
-  store.mutate((newState) => {
+  store.mutate((state) => {
     const ids = User.merge(result);
-    newState.set('users', ids);
+    return state.set('users', ids);
   });
 });
 
-router.all('/users/:userId/posts/create', async (req, resp, next) => {
-  const { store } = req,
-    { User, Post } = store.models,
-    { userId } = req.params,
+router.all('/users/:userId/posts/create', async (req, store, next) => {
+  const User = store.model('User');
+  const Post = store.model('Post');
+
+  const { userId } = req.params,
     { title } = req.body;
 
   const result = await fetch(`/api/users/${userId}/posts/create`, { title });
 
-  store.mutate((newState) => {
+  store.mutate((state) => {
     const postId = Post.merge(result);
-    const user = User.get(userId).set('posts', posts => posts.push(postId));
-    store.User.set(userId, user);
+    const mUser = User.get(userId).set('posts', posts => posts.push(postId));
+    User.set(mUser);
+    return state;
   });
 });
 
@@ -82,11 +78,12 @@ class UserListPage extends PureComponent {
 }
 
 module.exports = connect(({ state, dispatch, props, store }) => {
-  const { User, Post } = store.models;
-  const userIds = state.get('users').toJSON();
-  const users = User.mget(userIds).map((user) => {
-    user = user.toJSON();
-    user.posts = user.posts.map(postId => Post.get(postId).toJSON());
+  const User = store.model('User');
+  const Post = store.model('Post');
+
+  const userIds = state.get('users');
+  const users = User.get(userIds).map((user) => {
+    user.posts = user.posts.map(postId => Post.get(postId));
     return user;
   });
   return { users };
@@ -104,21 +101,20 @@ ReactDom.render(
   </Provider>,
   document.getElementById('app'),
 );
-
 ```
 
 ### Installation
 ```js
-yarn add stas react-stas uni-router -S
+yarn add stas react-stas -S
 ```
 or if your'd like to use npm:
 ```js
-npm install stas react-stas uni-router -S
+npm install stas react-stas -S
 ```
 
 ### Middleware
 
-#### store.use((req, resp, next)=>{})
+#### store.use((req, store, next)=>{})
 
 ### Router
 Like express router but with promise support. For detail see [uni-router](https://github.com/tianjianchn/midd/tree/master/packages/uni-router)
@@ -130,40 +126,24 @@ Prefix match `req.url` with pattern
 Exact match `req.url` with pattern
 
 ### Immutable State
-Use `List`, `Map` and `Model` to manipulate the state. For detail see [immutable-state](/packages/immutable-state).
+It's using [plain-immutable](/packages/plain-immutable) to make the state immutable. `plain-immutable` is a simple immutable library with array and plain object compatible. 
+```js
+import {immutable} from 'stas';
 
-#### store.mutate(callback)
-Start a new mutation operation. 
+const arr = immutable([1, 2, { a: 'b' }]);
+arr[0] = -1; // it will throw
+arr[2].a = 'c'; // it will throw too even you want to change the nested object
 
-#### .get(keysPath: array|string)
-Get the value on the specific keys path. 
+console.log(arr[2].a);// b
+console.log(JSON.stringify(arr));// [1,2,{"a":"b"}]
 
-#### .set(keysPath: array|string, value: json|function)
-Set the value on the specific keys path. If passed function, the function must return the result value.
-
-#### .toJSON() or .toJS()
-Convert to plain json object
-
-#### .keys()
-Return the keys
-
-#### .length or .size
-Return the keys length
-
-#### .filter()/.find()/.findKey()/.forEach()/.map()/.reduce()/
-Like array corresponding methods, most with `(value, key, thisArg)=>{}` signature.
-
-#### .remove(keyPath) or .delete(keyPath)
-Remove the leaf key
-
-#### .merge(strategy?: bool|function, input)
-Merge the value with specific strategy. 
-
-#### .slice()/.findIndex()/.push()/.pop()/.unshift()/.shift()
-Like array corresponding methods. `List` only.
+const mArr = arr.set(0, -1);
+console.log(arr[0]);// 1
+console.log(mArr[0]);// -1
+```
 
 ### Hot Reload(HMR)
-Since react-native doesn't support module.hot.accept(path, callback) but module.hot.accept(callback), we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
+Since react-native doesn't support `module.hot.accept(path, callback)` but `module.hot.accept(callback)`, we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
 ```js
 import Store from 'stas';
 import routers from './routers';
