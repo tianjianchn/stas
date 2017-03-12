@@ -1,7 +1,7 @@
 {
   "name": "plain-immutable",
   "description": "Make plain json data(array and object) immutable",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
