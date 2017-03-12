@@ -1,12 +1,13 @@
 
 import assert from 'assert';
-import immutable from '..';
+import immutable, { isImmutable } from '..';
 
 describe('plain-immutable: static', function () {
   it('should throw with unsupported type', function () {
-    assert.throws(() => immutable(new Date()), /Cannot make \[object Date\] immutable, only allow array and plain object/);
-    assert.throws(() => immutable(new Buffer('')), /Cannot make \[object Uint8Array\] immutable, only allow array and plain object/);
-    assert.throws(() => immutable(/a/), /Cannot make \[object RegExp\] immutable, only allow array and plain object/);
+    [new Date(), new Buffer(''), /a/].forEach((value) => {
+      immutable(value);
+      assert(!isImmutable(value));
+    });
   });
   it('should return literal type directly', function () {
     assert.strictEqual(immutable(null), null);

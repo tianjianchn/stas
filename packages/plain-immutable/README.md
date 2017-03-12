@@ -23,7 +23,7 @@ console.log(mArr[0]);// -1
 ### Static Methods
 #### immutable(value)
 *Alias immutable.fromJSON(), immutable.fromJS()*  
-Make the value immutable, only for array and plain object. If you pass a literal value(string, number or boolean), It will do nothing and return itself. Other types will be thrown an error. The value will be deeply made immutable on itself, no clone and copy.
+Make the value immutable, only for array and plain object. If you pass a literal value(string, number or boolean) or other types, It will do nothing and return itself. The value will be deeply made immutable, no copy.
 ```js
 import immutable from 'plain-immutable';
 

@@ -168,22 +168,32 @@ describe('plain-immutable: .set()/.setIn', function () {
       });
       shouldImmutable(arr, [], arr1, [undefined]);
     });
-    it('should work with immutable object key', function () {
-      const obj = immutable({ a: { b: 1 } });
-      const obj1 = obj.setIn('a', v => v.set('b', 2));
-      shouldImmutable(obj, { a: { b: 1 } }, obj1, { a: { b: 2 } });
-      const obj2 = obj.setIn('a', (v) => {
-        v.setIn('b', 2);
-      });
-      shouldImmutable(obj, { a: { b: 1 } }, obj2, { a: undefined });
+    it('should work with immutable object at the key', function () {
+      {
+        const obj = immutable({ a: { b: 1 } });
+        const obj1 = obj.setIn('a', v => v.set('b', 2));
+        shouldImmutable(obj, { a: { b: 1 } }, obj1, { a: { b: 2 } });
+        const obj2 = obj.setIn('a', (v) => {
+          v.setIn('b', 2);
+        });
+        shouldImmutable(obj, { a: { b: 1 } }, obj2, { a: undefined });
+      }
 
-      const arr = immutable([{ a: 1 }]);
-      const arr1 = arr.setIn(0, v => v.set('a', 2));
-      shouldImmutable(arr, [{ a: 1 }], arr1, [{ a: 2 }]);
-      const arr2 = arr.setIn(0, (v) => {
-        v.setIn('a', 2);
-      });
-      shouldImmutable(arr, [{ a: 1 }], arr2, [undefined]);
+      {
+        const arr = immutable([{ a: 1 }]);
+        const arr1 = arr.setIn(0, v => v.set('a', 2));
+        shouldImmutable(arr, [{ a: 1 }], arr1, [{ a: 2 }]);
+        const arr2 = arr.setIn(0, (v) => {
+          v.setIn('a', 2);
+        });
+        shouldImmutable(arr, [{ a: 1 }], arr2, [undefined]);
+      }
+
+      {
+        const obj = immutable({ a: { b: [1] } });
+        const obj1 = obj.setIn(['a', 'b'], v => v.push({ c: 2 }));
+        shouldImmutable(obj, { a: { b: [1] } }, obj1, { a: { b: [1, { c: 2 }] } });
+      }
     });
   });
 });
