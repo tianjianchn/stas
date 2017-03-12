@@ -4,7 +4,7 @@ import immutable, { isImmutable } from '..';
 
 describe('plain-immutable: static', function () {
   it('should throw with unsupported type', function () {
-    [new Date(), new Buffer(''), /a/].forEach((value) => {
+    [new Date(), new Buffer(''), /a/, { $$typeof: 0xeac7 }].forEach((value) => {
       immutable(value);
       assert(!isImmutable(value));
     });

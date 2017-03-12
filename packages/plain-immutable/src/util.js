@@ -1,4 +1,12 @@
 
+// react element is plain object too, so we need escape it from isPlainObject
+// see https://github.com/facebook/react/blob/v15.0.1/src/isomorphic/classic/element/ReactElement.js#L21
+const REACT_ELEMENT_TYPE_SYMBOL = typeof Symbol === 'function' && Symbol.for && Symbol.for('react.element');
+const REACT_ELEMENT_TYPE_NUMBER = 0xeac7;
+export function isReactElement(value) {
+  return value && (value.$$typeof === REACT_ELEMENT_TYPE_SYMBOL || value.$$typeof === REACT_ELEMENT_TYPE_NUMBER);
+}
+
 export function isPlainObject(value) {
   if (!value) return false;
   const proto = Object.getPrototypeOf(value);
