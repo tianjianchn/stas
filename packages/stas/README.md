@@ -142,6 +142,56 @@ console.log(arr[0]);// 1
 console.log(mArr[0]);// -1
 ```
 
+### Model
+Model is used to hold structured data and maintain their relationships. In short, it lets you operate like a database. In the real world app, data are mostly consisted of nested objects. See a post with user and comments:
+```js
+const post = {
+  id: 1,
+  title: 'Hello',
+  author: {
+    id: 1, name: 'Tian',
+  },
+  comments: [
+    { id: 1, text: 'Up', creater: { id: 2, name: 'Jian' } },
+    { id: 2, text: 'Thanks', creater: { id: 1, name: 'Tian' } },
+  ],
+};
+```
+If we want to change the user's name, many locations need to check and change, which is terrible! So we use models to flatten the structure, and use id to keep the records' relationships. 
+```js
+const store = new Store({ post: null });
+
+store.model('User');
+store.model('Post', { author: 'User', comments: ['Comment'] });
+store.model('Comment', { creater: 'User' });
+
+store.mutate((state) => {
+  const Post = store.model('Post');
+  const id = Post.merge(post);
+  return state.set('post', id);
+});
+
+console.log(store.state); // {post: 1}
+console.log(store.database);
+// { Post: { '1': { id: 1, title: 'Hello', author: 1, comments: [Object] } },
+//   User: { '1': { id: 1, name: 'Tian' }, '2': { id: 2, name: 'Jian' } },
+//   Comment:
+//    { '1': { id: 1, text: 'Up', creater: 2 },
+//      '2': { id: 2, text: 'Thanks', creater: 1 } } }
+```
+
+#### .get(id)
+Get the record(s). If you pass an array of ids, it will return an array of records. The return is always immutable.
+
+#### .set(record)
+Add or replace the record in database. 
+
+#### .merge(input)
+Normalize the input data and merge to database. Return the id or ids(if input is array).
+
+#### .remove(id)
+Remove the record(s)
+
 ### Hot Reload(HMR)
 Since react-native doesn't support `module.hot.accept(path, callback)` but `module.hot.accept(callback)`, we have to use a function to export the store, then replace store's middlewares(routers) by utilizing closure.
 ```js
