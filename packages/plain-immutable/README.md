@@ -15,9 +15,9 @@ arr[2].a = 'c'; // it will throw too even you want to change the nested object
 console.log(arr[2].a);// b
 console.log(JSON.stringify(arr));// [1,2,{"a":"b"}]
 
-const newArr = arr.set(0, -1);
+const mArr = arr.set(0, -1);
 console.log(arr[0]);// 1
-console.log(newArr[0]);// -1
+console.log(mArr[0]);// -1
 ```
 
 ### Static Methods
@@ -25,23 +25,29 @@ console.log(newArr[0]);// -1
 *Alias immutable.fromJSON(), immutable.fromJS()*  
 Make the value immutable, only for array and plain object. If you pass a literal value(string, number or boolean), It will do nothing and return itself. Other types will be thrown an error. The value will be deeply made immutable on itself, no clone and copy.
 ```js
+import immutable from 'plain-immutable';
+
 const arr = [{ a: 1 }];
 const arr1 = immutable(arr);
 console.log(arr === arr1);// true
 ```
 
-#### immutable.isImmutable(value: any)
+#### isImmutable(value: any)
+*Alias immutable.isImmutable()*  
 True if the value is an immutable array or object.
 ```js
+import immutable, {isImmutable} from 'plain-immutable';
+
 console.log(immutable.isImmutable(1)); // false
-console.log(immutable.isImmutable(true)); // false
-console.log(immutable.isImmutable('a')); // false
-console.log(immutable.isImmutable({})); // false
-console.log(immutable.isImmutable([])); // false
-console.log(immutable.isImmutable(Object.create(null))); // false
-console.log(immutable.isImmutable(immutable({}))); // true
-console.log(immutable.isImmutable(immutable([]))); // true
-console.log(immutable.isImmutable(immutable(Object.create(null)))); // true
+console.log(isImmutable(1)); // false
+console.log(isImmutable(true)); // false
+console.log(isImmutable('a')); // false
+console.log(isImmutable({})); // false
+console.log(isImmutable([])); // false
+console.log(isImmutable(Object.create(null))); // false
+console.log(isImmutable(immutable({}))); // true
+console.log(isImmutable(immutable([]))); // true
+console.log(isImmutable(immutable(Object.create(null)))); // true
 ```
 
 ### Additional Instace Methods
