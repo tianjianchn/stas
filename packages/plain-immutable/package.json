@@ -1,7 +1,7 @@
 {
   "name": "plain-immutable",
   "description": "Make plain json data(array and object) immutable",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -10,8 +10,7 @@
   "engines": {
     "node": ">= 4"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {},
   "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/plain-immutable",
   "repository": "https://github.com/tianjianchn/stas/tree/master/packages/plain-immutable",

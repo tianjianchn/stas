@@ -1,7 +1,7 @@
 {
   "name": "stas",
   "description": "A state management with promise middleware, immutable data and model normalization",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -11,8 +11,8 @@
     "node": ">= 4"
   },
   "dependencies": {
-    "plain-immutable": "^0.1.0",
-    "stas-core": "^0.3.0"
+    "plain-immutable": "^0.1.1",
+    "stas-core": "^0.4.0"
   },
   "devDependencies": {
     "promise-addition": "^0.1.4"

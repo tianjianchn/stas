@@ -1,7 +1,7 @@
 {
   "name": "stas-other-immutable",
   "description": "A state management with promise middleware, immutable data and model normalization",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {},
   "main": "dist/index.js",
   "files": [
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "immutable-state": "^0.3.0",
-    "stas-core": "^0.3.0"
+    "stas-core": "^0.4.0"
   },
   "devDependencies": {},
   "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-other-immutable",
