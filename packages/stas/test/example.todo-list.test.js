@@ -1,64 +1,60 @@
 
-const assert = require('assert');
-const createRouter = require('uni-router');
-// const { inspect } = require('util');
-const Store = require('..');
+import assert from 'assert';
+import 'promise-addition';
+import Store, { createRouter } from '..';
 
 describe('stas: todo list example', function () {
   it('should work', async function () {
     const store = new Store({
       tasks: [],
     });
-    const states = [store.getState()];
+    const Task = store.model('Task');
+    const states = [store.state];
 
     store.subscribe((newState) => {
       states.push(newState);
     });
 
     const router = createRouter();
-    router.all('/tasks/add', (req, resp, next) => {
-      store.mutate((newState) => {
-        newState.set('tasks', tasks => tasks.push(req.body.task));
+    router.all('/tasks/add', async (req, resp, next) => {
+      const { text } = req.body;
+      const task = await fetch('/tasks/add', { text });
+      store.mutate((state) => {
+        const id = Task.merge(task);
+        return state.set('tasks', tasks => tasks.push(id));
       });
     });
-    router.all('/tasks/toggle', (req, resp, next) => {
-      const id = req.body.id;
-      store.mutate((newState) => {
-        newState.set('tasks', (tasks) => {
-          const index = tasks.findIndex(t => t.id === id);
-          const completed = tasks.get([index, 'completed']);
-          tasks = tasks.set([index, 'completed'], !completed);
-          return tasks;
-        });
+    router.all('/tasks/toggle', async (req, resp, next) => {
+      const { id } = req.body;
+      await fetch('/tasks/toggle', { id });
+      store.mutate((state) => {
+        const task = Task.get(id);
+        const mTask = task.set('completed', !task.completed);
+        Task.set(mTask);
+        return state;
       });
     });
     store.use(router);
 
-    await store.dispatch('/tasks/add', { task: { id: 1, text: 'xxx', completed: false } });
-    assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }] });
+    await store.dispatch('/tasks/add', { text: 'xxx' });
+    assert.deepStrictEqual(store.state, { tasks: [1] });
+    assert.deepStrictEqual(store.database, { Task: { 1: { id: 1, text: 'xxx', completed: false } } });
+    assert.equal(states.length, 2);
+    assert.notEqual(states[0], states[1]);
 
-    await store.dispatch('/tasks/add', { task: { id: 2, text: 'yyy', completed: false } });
-    assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }, { id: 2, text: 'yyy', completed: false }] });
-
-    await store.dispatch('/tasks/toggle', { id: 2 });
-    assert.deepStrictEqual(store.state.toJSON(), { tasks: [{ id: 1, text: 'xxx', completed: false }, { id: 2, text: 'yyy', completed: true }] });
-
-    assert.deepStrictEqual(states.length, 4);
-    const [state1, state2, state3, state4] = states;
-
-    assert.notEqual(state1, state2);
-    assert.notEqual(state1, state3);
-    assert.notEqual(state1, state4);
-    assert.notEqual(state2, state3);
-    assert.notEqual(state2, state4);
-    assert.notEqual(state3, state4);
-
-    assert.notEqual(state1.toJSON(), state2.toJSON());
-    assert.notEqual(state1.toJSON(), state3.toJSON());
-    assert.notEqual(state1.toJSON(), state4.toJSON());
-    assert.notEqual(state2.toJSON(), state3.toJSON());
-    assert.notEqual(state2.toJSON(), state4.toJSON());
-    assert.notEqual(state3.toJSON(), state4.toJSON());
+    await store.dispatch('/tasks/toggle', { id: 1 });
+    assert.deepStrictEqual(store.state, { tasks: [1] });
+    assert.deepStrictEqual(store.database, { Task: { 1: { id: 1, text: 'xxx', completed: true } } });
+    assert.equal(states.length, 3);
+    assert.strictEqual(states[1], states[2]);
   });
 });
 
+let seq = 0;
+async function fetch(url, body) {
+  await Promise.delay(100);
+  if (url === '/tasks/add') {
+    seq += 1;
+    return { ...body, id: seq, completed: false };
+  }
+}

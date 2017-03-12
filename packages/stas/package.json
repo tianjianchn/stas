@@ -11,10 +11,12 @@
     "node": ">= 4"
   },
   "dependencies": {
-    "immutable-state": "^0.3.0",
+    "plain-immutable": "^0.1.0",
     "stas-core": "^0.3.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "promise-addition": "^0.1.4"
+  },
   "homepage": "https://github.com/tianjianchn/stas",
   "repository": "https://github.com/tianjianchn/stas",
   "bugs": "https://github.com/tianjianchn/stas/issues",

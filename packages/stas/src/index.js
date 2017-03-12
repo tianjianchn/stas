@@ -1,8 +1,10 @@
 
-const Store = require('./store');
-const { List, Map } = require('immutable-state');// eslint-disable-line no-shadow
+import { createRouter } from 'stas-core';
+import immutable, { isImmutable } from 'plain-immutable';
+import Store from './store';
 
-Store.Store = Store;
-Store.List = List;
-Store.Map = Map;
-module.exports = Store;
+export default Store;
+export {
+  createRouter, immutable, isImmutable,
+};
+
