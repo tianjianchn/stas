@@ -19,5 +19,5 @@ npm test # Run lint, clean, build and test:only tasks
 
 ### Release
 ```bash
-npm run publish
+npm run publish -- -m "bump version: xxx v0.1.0"
 ```
