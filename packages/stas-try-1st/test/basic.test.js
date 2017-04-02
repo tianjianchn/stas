@@ -3,7 +3,7 @@ const assert = require('assert');
 const createRouter = require('uni-router');
 const { Store } = require('..');
 
-describe('stas-other-immutable: basic', function () {
+describe('stas-try-1st: basic', function () {
   it('should work with initial state', function () {
     const store = new Store({ str: 'hello' });
     assert.deepStrictEqual(store.state.get('str'), 'hello');

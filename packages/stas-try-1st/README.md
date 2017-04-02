@@ -1,7 +1,7 @@
 A state management with promise middleware, immutable data and model normalization
 =================================
 
-RECOMMEND: Use [stas](https://github.com/tianjianchn/stas) with simple and seamless immutability support!
+**This is an early try of [stas](https://github.com/tianjianchn/stas)**
 
 ### Features
 * Express-like and promise-based middlewares and routers, see [Middleware](#middleware) and [Router](#router)
@@ -11,7 +11,7 @@ RECOMMEND: Use [stas](https://github.com/tianjianchn/stas) with simple and seaml
 ### Example
 ```js
 // store.js
-import { Store, Model } from 'stas-other-immutable';
+import { Store, Model } from 'stas-try-1st';
 import router from './router';
 
 const models = [

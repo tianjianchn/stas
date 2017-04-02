@@ -1,5 +1,5 @@
 {
-  "name": "stas-other-immutable",
+  "name": "stas-try-1st",
   "description": "A state management with promise middleware, immutable data and model normalization",
   "version": "0.3.1",
   "scripts": {},
@@ -15,8 +15,8 @@
     "stas-core": "^0.4.0"
   },
   "devDependencies": {},
-  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-other-immutable",
-  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/stas-other-immutable",
+  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/stas-try-1st",
+  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/stas-try-1st",
   "bugs": "https://github.com/tianjianchn/stas/issues",
   "license": "MIT",
   "author": {
