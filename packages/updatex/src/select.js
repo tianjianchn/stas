@@ -7,18 +7,23 @@ const NON_EXIST_VAL = { };
 // Make all nodes on the key path are mutable(clone them first)
 export default function select(keyPath) {
   const keys = parseKeyPath(keyPath) || [];
-  const path = [];
+
+  // Check the container, the top node
+  if (isReadOnly(this)) throw new Error('Only mutable object allowed in select()');
+  if (!this.$updatex) {
+    Object.defineProperty(this, '$updatex', {
+      value: { selectedPaths: {} },
+      writable: true,
+    });
+  }
 
   // node on the path, it is always mutable,
   // which is cloned and safe to mutate directly
   let node;
-
   let original; // the node's original value
+  const path = []; // the node's path
 
-  // Set node to current object first
-  if (isReadOnly(this)) throw new Error('Only mutable object allowed in select()');
   node = this;
-
   for (let ii = 0, len = keys.length; ii < len; ++ii) {
     const key = keys[ii];
     path.push(key);
@@ -45,20 +50,15 @@ export default function select(keyPath) {
     node = child;
 
     // No original value means that key path is sub string of the prev selected path;
-    if (original) addSelectedPath(path);
+    if (original) addSelectedPath.call(this, path);
   }
 
   return node;
 }
 
-// export for testing usage only
-export const state = {
-  selectedPaths: {},
-};
-
 function addSelectedPath(path) {
   const pathString = path.join('.');
-  const { selectedPaths } = state;
+  const { selectedPaths } = this.$updatex;
   if (selectedPaths[pathString]) return;
 
   // Check whether prev selected path is sub string of current
@@ -76,7 +76,7 @@ function addSelectedPath(path) {
 }
 
 export function checkOverSelect(cloned, original) {
-  const { selectedPaths } = state;
+  const { selectedPaths } = cloned.$updatex;
   const pathStrings = Object.keys(selectedPaths);
   for (let ii = 0, len = pathStrings.length; ii < len; ++ii) {
     const pathString = pathStrings[ii];
@@ -89,8 +89,6 @@ export function checkOverSelect(cloned, original) {
       console.warn(`No value changed in path(${pathString}), you may over select path`);
     }
   }
-
-  state.selectedPaths = {};
 }
 
 function getValueFromPath(obj, path) {

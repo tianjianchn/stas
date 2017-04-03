@@ -39,10 +39,10 @@ describe('updatex', function () {
 
     assert.deepStrictEqual(obj2, { a: 2 });
   });
-  it('should throw with invalid callback', function () {
+  it('should throw with invalid updater', function () {
     [1].forEach(check);
     function check(cb) {
-      shouldThrow(() => updatex({}, cb), `Invalid callback: ${stringify(cb)}, expect function`);
+      shouldThrow(() => updatex({}, cb), `Invalid updater: ${stringify(cb)}, expect function`);
     }
   });
   it('should keep original value without any changes', function () {
@@ -54,6 +54,15 @@ describe('updatex', function () {
 
     assert.strictEqual(obj, obj2);
     assert.deepStrictEqual(obj, { a: 1 });
+  });
+  it('should clear extra properties when updater end', function () {
+    const obj = { a: { b: 1 } };
+    const obj2 = updatex(obj, (newObj) => {
+      assert(!!newObj.select);
+      assert(!!newObj.$updatex);
+    });
+    assert(!obj2.select);
+    assert(!obj2.$updatex);
   });
 
   describe('options', function () {

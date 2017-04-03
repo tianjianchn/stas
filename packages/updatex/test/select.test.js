@@ -1,36 +1,33 @@
 
 import assert from 'assert';
-import select, { state, checkOverSelect } from '../dist/select';
+import select, { checkOverSelect } from '../dist/select';
 import immutable, { isReadOnly } from '../dist/readonly';
 import { stringify } from '../dist/util';
 import { shouldThrow } from './helper';
 
 describe('updatex: select', function () {
-  afterEach(function () {
-    state.selectedPaths = {};
-  });
   describe('input', function () {
     it('should throw when input is immutable', function () {
       const obj = immutable({ a: 1 });
       shouldThrow(() => select.call(obj), 'Only mutable object allowed in select()');
+      assert.deepStrictEqual(obj.$updatex, undefined);
 
       const arr = immutable([1]);
       shouldThrow(() => select.call(arr), 'Only mutable object allowed in select()');
-
-      assert.deepStrictEqual(state.selectedPaths, {});
+      assert.deepStrictEqual(arr.$updatex, undefined);
     });
     it('should not clone when input is not immutable', function () {
       const obj = { a: 1 };
       const obj2 = select.call(obj);
       assert.strictEqual(obj, obj2);
       assert.deepStrictEqual(obj, { a: 1 });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, {});
 
       const arr = [1, 2];
       const arr2 = select.call(arr);
       assert.strictEqual(arr, arr2);
       assert.deepStrictEqual(arr, [1, 2]);
-
-      assert.deepStrictEqual(state.selectedPaths, {});
+      assert.deepStrictEqual(arr.$updatex.selectedPaths, {});
     });
   });
 
@@ -51,7 +48,7 @@ describe('updatex: select', function () {
       assert(!isReadOnly(bb));
       assert.deepStrictEqual(bb, { c: 1 });
 
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
     });
     it('should work with array path', function () {
       const obj = makeInput({ a: { b: { c: 1 } } });
@@ -61,7 +58,7 @@ describe('updatex: select', function () {
       assert(!isReadOnly(bb));
       assert.deepStrictEqual(bb, { c: 1 });
 
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
     });
     it('should work with number path', function () {
       const arr = makeInput([{ a: 1 }]);
@@ -71,7 +68,7 @@ describe('updatex: select', function () {
       assert(!isReadOnly(first));
       assert.deepStrictEqual(first, { a: 1 });
 
-      assert.deepStrictEqual(state.selectedPaths, { 0: ['0'] });
+      assert.deepStrictEqual(arr.$updatex.selectedPaths, { 0: ['0'] });
     });
     it('should throw without string and array path', function () {
       const obj = makeInput({ a: { b: { c: 1 } } });
@@ -100,23 +97,23 @@ describe('updatex: select', function () {
     it('should not change anything when selecting sub path', function () {
       const obj = makeInput({ a: { b: { c: 1 } } });
       const bb = select.call(obj, 'a.b');
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
 
       const aa = select.call(obj, 'a');
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
       assert.strictEqual(aa.b, bb);
 
       const bb2 = select.call(obj, 'a.b');
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
       assert.strictEqual(bb2, bb);
     });
     it('should overwrite when selecting further path', function () {
       const obj = makeInput({ a: { b: { c: 1 } } });
       const aa = select.call(obj, 'a');
-      assert.deepStrictEqual(state.selectedPaths, { a: ['a'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { a: ['a'] });
 
       const bb = select.call(obj, 'a.b');
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(obj.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
       assert.strictEqual(aa.b, bb);
     });
   });
@@ -129,9 +126,9 @@ describe('updatex: select', function () {
       const bb = select.call(cloned, 'a.b');
       bb.c = 2;
       assert.deepStrictEqual(original, { a: { b: { c: 1 } } });
-      assert.deepStrictEqual(state.selectedPaths, { 'a.b': ['a', 'b'] });
+      assert.deepStrictEqual(original.$updatex, undefined);
+      assert.deepStrictEqual(cloned.$updatex.selectedPaths, { 'a.b': ['a', 'b'] });
       shouldNotOverSelect(cloned, original);
-      assert.deepStrictEqual(state.selectedPaths, { });
     });
     it('should over select when value is not changed', function () {
       const original = immutable({ a: { b: { c: 1 } } });
