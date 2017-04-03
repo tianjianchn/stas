@@ -1,0 +1,31 @@
+{
+  "name": "updatex",
+  "description": "Update json with immutability and declarative manner",
+  "version": "0.1.0",
+  "scripts": {},
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 4"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "homepage": "https://github.com/tianjianchn/stas/tree/master/packages/updatex",
+  "repository": "https://github.com/tianjianchn/stas/tree/master/packages/updatex",
+  "bugs": "https://github.com/tianjianchn/stas/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Tian Jian",
+    "email": "tianjianchn@qq.com"
+  },
+  "keywords": [
+    "readonly",
+    "immutable",
+    "json",
+    "array",
+    "plain object",
+    "declarative"
+  ]
+}
